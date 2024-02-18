@@ -44,3 +44,17 @@ resource "google_compute_route" "default" {
   next_hop_gateway = "default-internet-gateway"
   priority = 1000
 }
+
+resource "google_compute_firewall" "default" {
+  count = length(local.vpc_names)
+  name    = count.index == 0 ? "webapp-firewall" : "${local.vpc_names[count.index]}-webapp-firewall"
+  network = google_compute_network.vpc_network[count.index].id
+  allow {
+    protocol = "tcp"
+    ports    = ["3000"]
+  }
+
+  direction = "INGRESS"
+  target_tags = [ "http-server" ]
+  source_ranges = ["0.0.0.0/0"]
+}
