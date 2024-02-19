@@ -9,9 +9,9 @@ variable "gcp_project" {
   description = "Project to use for this config"
 }
 
-variable vpc_configs {
+variable "vpc_configs" {
   type = map(object({
-      webapp_ip_cidr = string
-      db_ip_cidr = string
+    webapp_ip_cidr = string
+    db_ip_cidr     = string
   }))
 }
