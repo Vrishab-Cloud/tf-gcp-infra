@@ -9,6 +9,8 @@ locals {
   webapp_ip_cidrs = [for vpc_config in values(var.vpc_configs) : vpc_config.webapp_ip_cidr]
 
   db_ip_cidrs = [for vpc_config in values(var.vpc_configs) : vpc_config.db_ip_cidr]
+
+  route_modes = [for vpc_config in values(var.vpc_configs) : vpc_config.routing_mode]
 }
 
 resource "google_compute_network" "vpc_network" {
@@ -16,7 +18,7 @@ resource "google_compute_network" "vpc_network" {
   name                            = local.vpc_names[count.index]
   auto_create_subnetworks         = false
   mtu                             = 1460
-  routing_mode                    = "REGIONAL"
+  routing_mode                    = local.route_modes[count.index]
   delete_default_routes_on_create = true
 }
 
