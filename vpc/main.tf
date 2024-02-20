@@ -4,7 +4,7 @@ provider "google" {
 }
 
 locals {
-  vpc_names = keys(var.vpc_configs)
+  vpc_names = keys(var.vpc_config)
 
   webapp_ip_cidrs = [for vpc_config in values(var.vpc_configs) : vpc_config.webapp_ip_cidr]
 
