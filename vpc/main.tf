@@ -1,8 +1,3 @@
-provider "google" {
-  region  = var.vpc_region
-  project = var.gcp_project
-}
-
 locals {
   vpc_names = keys(var.vpc_configs)
 
@@ -57,6 +52,6 @@ resource "google_compute_firewall" "default" {
   }
 
   direction     = "INGRESS"
-  target_tags   = ["http-server"]
+  target_tags   = ["webapp", "http"]
   source_ranges = ["0.0.0.0/0"]
 }

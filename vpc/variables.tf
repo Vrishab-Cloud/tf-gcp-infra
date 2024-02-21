@@ -4,11 +4,6 @@ variable "vpc_region" {
   default     = "us-east1"
 }
 
-variable "gcp_project" {
-  type        = string
-  description = "Project to use for this config"
-}
-
 variable "vpc_configs" {
   type = map(object({
     webapp_ip_cidr = string

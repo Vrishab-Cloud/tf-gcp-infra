@@ -31,7 +31,12 @@
 
 (Note: It downloads the provider)
 
-8) At end of the provisioning
+8) Plan & Apply
+        
+        terraform plan
+        terraform apply
+
+9) At end of the provisioning
         
         gcloud auth revoke
 
