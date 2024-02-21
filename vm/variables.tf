@@ -24,6 +24,11 @@ variable "boot_disk_type" {
   type        = string
 }
 
+variable "tags" {
+  description = "Firewall tags to be applied to the VM"
+  type        = list(string)
+}
+
 variable "boot_disk_size" {
   description = "Disk Size"
   type        = number

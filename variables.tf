@@ -11,11 +11,12 @@ variable "vpc_region" {
 
 #VPC
 variable "vpc_configs" {
-  type = map(object({
+  type = object({
+    name           = string
     webapp_ip_cidr = string
     db_ip_cidr     = string
     routing_mode   = string
-  }))
+  })
 }
 
 # VM

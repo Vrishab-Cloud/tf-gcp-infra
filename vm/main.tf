@@ -4,7 +4,7 @@ resource "google_compute_instance" "vm" {
   machine_type = var.machine_type
 
   zone = var.zone
-  tags = ["webapp"]
+  tags = var.tags
   boot_disk {
     device_name = var.vm_name
 

@@ -1,51 +1,37 @@
-locals {
-  vpc_names = keys(var.vpc_configs)
-
-  webapp_ip_cidrs = [for vpc_config in values(var.vpc_configs) : vpc_config.webapp_ip_cidr]
-
-  db_ip_cidrs = [for vpc_config in values(var.vpc_configs) : vpc_config.db_ip_cidr]
-
-  route_modes = [for vpc_config in values(var.vpc_configs) : vpc_config.routing_mode]
-}
-
 resource "google_compute_network" "vpc_network" {
-  count                           = length(local.vpc_names)
-  name                            = local.vpc_names[count.index]
+  name                            = var.name
   auto_create_subnetworks         = false
   mtu                             = 1460
-  routing_mode                    = local.route_modes[count.index]
+  routing_mode                    = var.routing_mode
   delete_default_routes_on_create = true
 }
 
 resource "google_compute_subnetwork" "subnet_webapp" {
-  count         = length(local.webapp_ip_cidrs)
-  name          = count.index == 0 ? "webapp" : "${local.vpc_names[count.index]}-webapp"
-  ip_cidr_range = local.webapp_ip_cidrs[count.index]
-  region        = var.vpc_region
-  network       = google_compute_network.vpc_network[count.index].id
+  name          = "webapp"
+  ip_cidr_range = var.webapp_ip_cidr
+  region        = var.region
+  network       = google_compute_network.vpc_network.id
 }
 
 resource "google_compute_subnetwork" "subnet_db" {
-  count         = length(local.db_ip_cidrs)
-  name          = count.index == 0 ? "db" : "${local.vpc_names[count.index]}-db"
-  ip_cidr_range = local.db_ip_cidrs[count.index]
-  region        = var.vpc_region
-  network       = google_compute_network.vpc_network[count.index].id
+  name          = "db"
+  ip_cidr_range = var.db_ip_cidr
+  region        = var.region
+  network       = google_compute_network.vpc_network.id
 }
 
+
 resource "google_compute_route" "default" {
-  count            = length(local.vpc_names)
-  name             = count.index == 0 ? "webapp-route" : "${local.vpc_names[count.index]}-webapp-route"
+  name             = "webapp-route"
   dest_range       = "0.0.0.0/0"
-  network          = google_compute_network.vpc_network[count.index].id
+  network          = google_compute_network.vpc_network.id
   next_hop_gateway = "default-internet-gateway"
   priority         = 1000
 }
 
 resource "google_compute_firewall" "default" {
-  count   = length(local.vpc_names)
-  name    = count.index == 0 ? "webapp-firewall" : "${local.vpc_names[count.index]}-webapp-firewall"
-  network = google_compute_network.vpc_network[count.index].id
+  name    = "webapp-firewall"
+  network = google_compute_network.vpc_network.id
   allow {
     protocol = "tcp"
     ports    = ["3000"]
