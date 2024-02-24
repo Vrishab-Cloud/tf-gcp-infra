@@ -1,4 +1,4 @@
-variable "vm_name" {
+variable "name" {
   description = "Name of the VM instance"
   type        = string
 }
@@ -11,7 +11,6 @@ variable "machine_type" {
 variable "zone" {
   description = "Zone for the VM"
   type        = string
-  default     = "us-east1-b"
 }
 
 variable "boot_disk_image" {
@@ -42,5 +41,4 @@ variable "subnetwork" {
 variable "network_tier" {
   description = "Network tier"
   type        = string
-  default     = "STANDARD"
 }

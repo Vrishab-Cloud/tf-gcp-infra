@@ -16,48 +16,21 @@ variable "vpc_configs" {
     webapp_ip_cidr = string
     db_ip_cidr     = string
     routing_mode   = string
+    region         = optional(string, "us-east1")
   })
 }
 
 # VM
-variable "vm_name" {
-  description = "Name of the VM instance"
-  type        = string
-}
 
-variable "machine_type" {
-  description = "Machine type for the VM"
-  type        = string
-}
+variable "vm_configs" {
+  type = object({
+    name            = string
+    machine_type    = string
+    zone            = optional(string, "us-east1-b")
+    boot_disk_image = string
+    boot_disk_type  = string
+    boot_disk_size  = number
+    network_tier    = optional(string, "STANDARD")
+  })
 
-variable "zone" {
-  description = "Zone for the VM"
-  type        = string
-  default     = "us-east1-b"
-}
-
-variable "boot_disk_image" {
-  description = "Custom Image for the disk"
-  type        = string
-}
-
-variable "boot_disk_type" {
-  description = "Disk Type"
-  type        = string
-}
-
-variable "boot_disk_size" {
-  description = "Disk Size"
-  type        = number
-}
-
-variable "subnetwork" {
-  description = "VPC subnetwork to launch the VM in"
-  type        = string
-}
-
-variable "network_tier" {
-  description = "Network tier"
-  type        = string
-  default     = "STANDARD"
 }

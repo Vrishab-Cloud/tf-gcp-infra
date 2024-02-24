@@ -1,7 +1,6 @@
 #VPC
 variable "region" {
-  type    = string
-  default = "us-east1"
+  type = string
 }
 
 variable "name" {
