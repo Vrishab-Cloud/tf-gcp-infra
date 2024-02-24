@@ -23,7 +23,7 @@ module "vpc" {
 
 module "vm" {
   source          = "./vm"
-  name         = var.vm_configs.name
+  name            = var.vm_configs.name
   machine_type    = var.vm_configs.machine_type
   zone            = var.vm_configs.zone
   boot_disk_image = var.vm_configs.boot_disk_image

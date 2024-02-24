@@ -14,7 +14,7 @@
 
 4) Create and set Terraform up to use our current login:
 
-        PROJECT_ID=cloud-${RANDOM}
+        PROJECT_ID=dev-${RANDOM}
         gcloud projects create $PROJECT_ID --set-as-default
 
         gcloud auth application-default login
@@ -23,7 +23,9 @@
    
 6) Enable required APIs 
    
-        gcloud services enable compute.googleapis.com
+        gcloud services enable compute.googleapis.com --project=$PROJECT_ID
+
+        gcloud services enable servicenetworking.googleapis.com --project=$PROJECT_ID
 
 7) Initialize terraform
         
