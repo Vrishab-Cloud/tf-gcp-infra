@@ -25,4 +25,5 @@ resource "google_compute_instance" "vm" {
     stack_type = "IPV4_ONLY"
   }
 
+  metadata_startup_script = var.startup_script_content
 }

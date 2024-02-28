@@ -42,3 +42,8 @@ variable "network_tier" {
   description = "Network tier"
   type        = string
 }
+
+variable "startup_script_content" {
+  description = "Content of the startup script"
+  type        = string
+}

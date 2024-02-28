@@ -2,8 +2,7 @@ variable "gcp_project" {
   type        = string
   description = "Project to use for this config"
 }
-
-variable "vpc_region" {
+variable "gcp_region" {
   type        = string
   description = "Region to use for GCP provider"
   default     = "us-east1"
@@ -21,7 +20,6 @@ variable "vpc_configs" {
 }
 
 # VM
-
 variable "vm_configs" {
   type = object({
     name            = string
@@ -33,4 +31,32 @@ variable "vm_configs" {
     network_tier    = optional(string, "STANDARD")
   })
 
+}
+
+variable "internal_ip_address" {
+  type = string
+}
+
+variable "internal_ip_name" {
+  type = string
+}
+
+variable "internal_ip_purpose" {
+  type    = string
+  default = "PRIVATE_SERVICE_CONNECT"
+}
+
+variable "sql_configs" {
+  type = object({
+    db_name              = string
+    deletion_protection  = optional(bool, false)
+    instance_name_prefix = string
+    disk_type            = string
+    disk_size            = string
+    instance_region      = optional(string, "us-east1")
+    db_version           = optional(string, "MYSQL_5_7")
+    availability_type    = optional(string, "REGIONAL")
+    consumer_projects    = optional(list(string), [])
+    sql_user             = optional(string, "admin")
+  })
 }

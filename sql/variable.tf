@@ -3,8 +3,7 @@ variable "db_name" {
 }
 
 variable "deletion_protection" {
-  type    = bool
-  default = false
+  type = bool
 }
 
 variable "instance_name_prefix" {
@@ -13,17 +12,14 @@ variable "instance_name_prefix" {
 
 variable "instance_region" {
   type = string
-  # default = "us-east1"
 }
 
 variable "db_version" {
   type = string
-  # default = "MYSQL_5_7"
 }
 
 variable "availability_type" {
   type = string
-  # default = "REGIONAL"
 }
 
 variable "disk_type" {
@@ -45,5 +41,4 @@ variable "private_network" {
 
 variable "sql_user" {
   type = string
-  # default = "admin"
 }
