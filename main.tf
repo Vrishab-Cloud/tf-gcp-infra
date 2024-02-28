@@ -13,13 +13,13 @@ provider "google" {
 }
 
 module "vpc" {
-  source         = "./vpc"
-  name           = var.vpc_configs.name
-  webapp_ip_cidr = var.vpc_configs.webapp_ip_cidr
-  db_ip_cidr     = var.vpc_configs.db_ip_cidr
-  routing_mode   = var.vpc_configs.routing_mode
-  region         = var.vpc_configs.region
-  webapp_tags = var.vpc_configs.webapp_tags
+  source           = "./vpc"
+  name             = var.vpc_configs.name
+  webapp_ip_cidr   = var.vpc_configs.webapp_ip_cidr
+  db_ip_cidr       = var.vpc_configs.db_ip_cidr
+  routing_mode     = var.vpc_configs.routing_mode
+  region           = var.vpc_configs.region
+  webapp_tags      = var.vpc_configs.webapp_tags
   db_source_ranges = var.vpc_configs.db_source_ranges
 }
 
