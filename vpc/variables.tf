@@ -18,3 +18,11 @@ variable "db_ip_cidr" {
 variable "routing_mode" {
   type = string
 }
+
+variable "webapp_tags" {
+  type = list(string)
+}
+
+variable "db_source_ranges" {
+  type = list(string)
+}

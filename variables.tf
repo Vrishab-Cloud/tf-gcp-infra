@@ -11,11 +11,13 @@ variable "gcp_region" {
 #VPC
 variable "vpc_configs" {
   type = object({
-    name           = string
-    webapp_ip_cidr = string
-    db_ip_cidr     = string
-    routing_mode   = string
-    region         = optional(string, "us-east1")
+    name             = string
+    webapp_ip_cidr   = string
+    db_ip_cidr       = string
+    routing_mode     = string
+    region           = optional(string, "us-east1")
+    webapp_tags      = list(string)
+    db_source_ranges = list(string)
   })
 }
 
@@ -52,7 +54,7 @@ variable "sql_configs" {
     deletion_protection  = optional(bool, false)
     instance_name_prefix = string
     disk_type            = string
-    disk_size            = string
+    disk_size            = number
     instance_region      = optional(string, "us-east1")
     db_version           = optional(string, "MYSQL_5_7")
     availability_type    = optional(string, "REGIONAL")

@@ -19,6 +19,8 @@ module "vpc" {
   db_ip_cidr     = var.vpc_configs.db_ip_cidr
   routing_mode   = var.vpc_configs.routing_mode
   region         = var.vpc_configs.region
+  webapp_tags = var.vpc_configs.webapp_tags
+  db_source_ranges = var.vpc_configs.db_source_ranges
 }
 
 module "sql" {
@@ -73,7 +75,7 @@ module "vm" {
       #!/bin/bash
 
       if [ -e "/opt/webapp/app/.env" ]; then
-        exit 1
+        exit 0
       fi
 
       touch /tmp/.env

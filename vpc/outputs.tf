@@ -11,5 +11,5 @@ output "vpc_id" {
 }
 
 output "webapp_firewall_tags" {
-  value = google_compute_firewall.default.target_tags
+  value = var.webapp_tags
 }
