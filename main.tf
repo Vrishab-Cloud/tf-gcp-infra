@@ -72,6 +72,10 @@ module "vm" {
   startup_script_content = <<-EOT
       #!/bin/bash
 
+      if [ -e "/opt/webapp/app/.env" ]; then
+        exit 1
+      fi
+
       touch /tmp/.env
 
       echo "PROD_DB_NAME=${module.sql.db_name}" >> /tmp/.env
@@ -80,8 +84,8 @@ module "vm" {
       echo "PROD_HOST=${var.internal_ip_address}" >> /tmp/.env
       echo "NODE_ENV=production" >> /tmp/.env
 
-      sudo mv /tmp/.env /opt/webapp/app
-      sudo chown csye6225:csye6225 /opt/webapp/app/.env
+      mv /tmp/.env /opt/webapp/app
+      chown csye6225:csye6225 /opt/webapp/app/.env
 
       EOT
 
