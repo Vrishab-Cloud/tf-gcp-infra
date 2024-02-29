@@ -11,12 +11,12 @@ variable "gcp_region" {
 #VPC
 variable "vpc_configs" {
   type = object({
-    name             = string
-    webapp_ip_cidr   = string
-    db_ip_cidr       = string
-    routing_mode     = string
-    region           = optional(string, "us-east1")
-    webapp_tags      = list(string)
+    name           = string
+    webapp_ip_cidr = string
+    db_ip_cidr     = string
+    routing_mode   = string
+    region         = optional(string, "us-east1")
+    webapp_tags    = list(string)
   })
 }
 
