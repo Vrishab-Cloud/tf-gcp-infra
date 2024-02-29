@@ -32,9 +32,12 @@ variable "disk_size" {
 
 variable "consumer_projects" {
   type = list(string)
-  # default = []
 }
 
 variable "sql_user" {
+  type = string
+}
+
+variable "tier" {
   type = string
 }

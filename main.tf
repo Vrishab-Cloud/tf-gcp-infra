@@ -34,6 +34,7 @@ module "sql" {
   availability_type    = var.sql_configs.availability_type
   consumer_projects    = var.sql_configs.consumer_projects
   sql_user             = var.sql_configs.sql_user
+  tier                 = var.sql_configs.db_tier
 }
 
 resource "google_compute_address" "internal_ip" {
@@ -49,7 +50,7 @@ data "google_sql_database_instance" "mysql_instance" {
 
 
 resource "google_compute_forwarding_rule" "forwarding_rule" {
-  name                  = "psforwardingrule"
+  name                  = var.forwarding_rule_name
   target                = data.google_sql_database_instance.mysql_instance.psc_service_attachment_link
   network               = module.vpc.vpc_id
   ip_address            = google_compute_address.internal_ip.self_link

@@ -15,7 +15,7 @@ resource "google_sql_database_instance" "mysql_instance" {
   database_version = var.db_version
 
   settings {
-    tier = "db-f1-micro"
+    tier = var.tier
 
     disk_size         = var.disk_size
     disk_type         = var.disk_type
