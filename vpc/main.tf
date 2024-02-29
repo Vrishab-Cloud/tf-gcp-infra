@@ -41,6 +41,7 @@ resource "google_compute_firewall" "allow_http" {
   direction     = "INGRESS"
   target_tags   = concat(var.webapp_tags, ["http", "ingress"])
   source_ranges = ["0.0.0.0/0"]
+  destination_ranges = [var.webapp_ip_cidr]
 }
 
 resource "google_compute_firewall" "allow_db" {
@@ -53,7 +54,8 @@ resource "google_compute_firewall" "allow_db" {
 
   direction     = "EGRESS"
   target_tags   = concat(var.webapp_tags, ["db", "egress"])
-  source_ranges = var.db_source_ranges
+  source_ranges = [var.webapp_ip_cidr]
+  destination_ranges = [var.db_ip_cidr]
 }
 
 resource "google_compute_firewall" "deny_others_ingress" {
@@ -67,6 +69,7 @@ resource "google_compute_firewall" "deny_others_ingress" {
   priority      = 65534
   direction     = "INGRESS"
   source_ranges = ["0.0.0.0/0"]
+  destination_ranges = [var.webapp_ip_cidr]
 }
 
 resource "google_compute_firewall" "deny_others_egress" {
@@ -79,5 +82,6 @@ resource "google_compute_firewall" "deny_others_egress" {
 
   priority      = 65534
   direction     = "EGRESS"
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = [var.webapp_ip_cidr]
+  destination_ranges = ["0.0.0.0/0"]
 }

@@ -17,7 +17,6 @@ variable "vpc_configs" {
     routing_mode     = string
     region           = optional(string, "us-east1")
     webapp_tags      = list(string)
-    db_source_ranges = list(string)
   })
 }
 

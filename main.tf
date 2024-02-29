@@ -20,7 +20,6 @@ module "vpc" {
   routing_mode     = var.vpc_configs.routing_mode
   region           = var.vpc_configs.region
   webapp_tags      = var.vpc_configs.webapp_tags
-  db_source_ranges = var.vpc_configs.db_source_ranges
 }
 
 module "sql" {
@@ -53,7 +52,6 @@ data "google_sql_database_instance" "mysql_instance" {
 resource "google_compute_forwarding_rule" "forwarding_rule" {
   name   = "psforwardingrule"
   target = data.google_sql_database_instance.mysql_instance.psc_service_attachment_link
-  # target                = "all-apis"
   network               = module.vpc.vpc_id
   ip_address            = google_compute_address.internal_ip.self_link
   load_balancing_scheme = ""

@@ -22,7 +22,3 @@ variable "routing_mode" {
 variable "webapp_tags" {
   type = list(string)
 }
-
-variable "db_source_ranges" {
-  type = list(string)
-}
