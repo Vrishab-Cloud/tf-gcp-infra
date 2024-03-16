@@ -90,3 +90,14 @@ module "vm" {
       EOT
   depends_on             = [google_compute_address.internal_ip]
 }
+
+data "google_dns_managed_zone" "dns_zone" {
+  name = var.dns_zone_name
+}
+resource "google_dns_record_set" "default" {
+  managed_zone = data.google_dns_managed_zone.dns_zone.name
+  name         = "webapp.${data.google_dns_managed_zone.dns_zone.dns_name}"
+  type         = "A"
+  rrdatas      = [module.vm.vm_external_ip]
+  ttl          = var.dns_record_ttl
+}

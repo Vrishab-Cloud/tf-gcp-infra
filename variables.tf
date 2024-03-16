@@ -62,3 +62,11 @@ variable "sql_configs" {
     db_tier              = optional(string, "db-f1-micro")
   })
 }
+
+variable "dns_zone_name" {
+  type = string
+}
+
+variable "dns_record_ttl" {
+  type = number
+}
