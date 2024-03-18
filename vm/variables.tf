@@ -47,3 +47,8 @@ variable "startup_script_content" {
   description = "Content of the startup script"
   type        = string
 }
+
+variable "gcp_project_id" {
+   type        = string
+  description = "Project to use for IAM config"
+}

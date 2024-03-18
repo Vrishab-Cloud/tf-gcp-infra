@@ -60,6 +60,7 @@ resource "google_compute_forwarding_rule" "forwarding_rule" {
 
 module "vm" {
   source                 = "./vm"
+  gcp_project_id         = var.gcp_project
   name                   = var.vm_configs.name
   machine_type           = var.vm_configs.machine_type
   zone                   = var.vm_configs.zone
