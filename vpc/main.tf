@@ -7,11 +7,11 @@ resource "google_compute_network" "vpc_network" {
 }
 
 resource "google_compute_subnetwork" "subnet_webapp" {
-  name          = "webapp"
-  ip_cidr_range = var.webapp_ip_cidr
-  region        = var.region
+  name                     = "webapp"
+  ip_cidr_range            = var.webapp_ip_cidr
+  region                   = var.region
   private_ip_google_access = true
-  network       = google_compute_network.vpc_network.id
+  network                  = google_compute_network.vpc_network.id
 }
 
 resource "google_compute_subnetwork" "subnet_db" {
