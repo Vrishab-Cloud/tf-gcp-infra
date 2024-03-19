@@ -8,7 +8,7 @@ resource "google_project_iam_binding" "logging" {
   role    = "roles/logging.admin"
 
   members = [
-    google_service_account.service_account.email,
+    "serviceAccount:${google_service_account.service_account.email}",
   ]
 
   depends_on = [google_service_account.service_account]
@@ -19,7 +19,7 @@ resource "google_project_iam_binding" "monitoring" {
   role    = "roles/monitoring.metricWriter"
 
   members = [
-    google_service_account.service_account.email,
+    "serviceAccount:${google_service_account.service_account.email}",
   ]
 
   depends_on = [google_service_account.service_account]
@@ -55,8 +55,7 @@ resource "google_compute_instance" "vm" {
   service_account {
     email = google_service_account.service_account.email
     scopes = [
-      "https://www.googleapis.com/auth/logging.admin",
-      "https://www.googleapis.com/auth/monitoring.write"
+      "cloud-platform"
     ]
   }
 

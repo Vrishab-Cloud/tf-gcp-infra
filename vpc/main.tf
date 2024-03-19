@@ -10,6 +10,7 @@ resource "google_compute_subnetwork" "subnet_webapp" {
   name          = "webapp"
   ip_cidr_range = var.webapp_ip_cidr
   region        = var.region
+  private_ip_google_access = true
   network       = google_compute_network.vpc_network.id
 }
 
@@ -57,18 +58,18 @@ resource "google_compute_firewall" "allow_db" {
   destination_ranges = [var.db_ip_cidr]
 }
 
-resource "google_compute_firewall" "deny_others_ingress" {
-  name    = "webapp-firewall-others-ingress"
-  network = google_compute_network.vpc_network.id
+# resource "google_compute_firewall" "deny_others_ingress" {
+#   name    = "webapp-firewall-others-ingress"
+#   network = google_compute_network.vpc_network.id
 
-  deny {
-    protocol = "all"
-  }
+#   deny {
+#     protocol = "all"
+#   }
 
-  priority      = 65534
-  direction     = "INGRESS"
-  source_ranges = ["0.0.0.0/0"]
-}
+#   priority      = 65534
+#   direction     = "INGRESS"
+#   source_ranges = ["0.0.0.0/0"]
+# }
 
 resource "google_compute_firewall" "deny_others_egress" {
   name    = "webapp-firewall-others-egress"
