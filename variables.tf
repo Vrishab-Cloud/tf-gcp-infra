@@ -17,8 +17,6 @@ variable "vpc_configs" {
     routing_mode   = string
     region         = optional(string, "us-east1")
     webapp_tags    = list(string)
-    logger_id      = optional(string, "logger")
-    logger_name    = optional(string, "logger")
   })
 }
 
@@ -32,6 +30,8 @@ variable "vm_configs" {
     boot_disk_type  = string
     boot_disk_size  = number
     network_tier    = optional(string, "STANDARD")
+    logger_id       = optional(string, "logger")
+    logger_name     = optional(string, "logger")
   })
 
 }
