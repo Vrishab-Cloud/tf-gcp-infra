@@ -17,6 +17,8 @@ variable "vpc_configs" {
     routing_mode   = string
     region         = optional(string, "us-east1")
     webapp_tags    = list(string)
+    logger_id      = optional(string, "logger")
+    logger_name    = optional(string, "logger")
   })
 }
 

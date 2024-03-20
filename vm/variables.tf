@@ -52,3 +52,13 @@ variable "gcp_project_id" {
   type        = string
   description = "Project to use for IAM config"
 }
+
+variable "service_account_id" {
+  type = string
+  description = "Id for logger service account"
+}
+
+variable "service_account_name" {
+  type = string
+  description = "Display name for logger service account"
+}

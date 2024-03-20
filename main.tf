@@ -70,6 +70,8 @@ module "vm" {
   boot_disk_type         = var.vm_configs.boot_disk_type
   tags                   = module.vpc.webapp_firewall_tags
   network_tier           = var.vm_configs.network_tier
+  service_account_id     = var.vm_configs.logger_id
+  service_account_name   = var.vm_configs.logger_name
   startup_script_content = <<-EOT
       #!/bin/bash
 
