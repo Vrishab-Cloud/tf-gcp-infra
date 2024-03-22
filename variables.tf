@@ -32,6 +32,7 @@ variable "vm_configs" {
     network_tier    = optional(string, "STANDARD")
     logger_id       = optional(string, "logger")
     logger_name     = optional(string, "logger")
+    roles           = optional(set(string))
   })
 
 }

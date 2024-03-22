@@ -72,6 +72,7 @@ module "vm" {
   network_tier           = var.vm_configs.network_tier
   service_account_id     = var.vm_configs.logger_id
   service_account_name   = var.vm_configs.logger_name
+  roles                  = var.vm_configs.roles
   startup_script_content = <<-EOT
       #!/bin/bash
 

@@ -54,11 +54,15 @@ variable "gcp_project_id" {
 }
 
 variable "service_account_id" {
-  type = string
+  type        = string
   description = "Id for logger service account"
 }
 
 variable "service_account_name" {
-  type = string
+  type        = string
   description = "Display name for logger service account"
+}
+
+variable "roles" {
+  type = set(string)
 }

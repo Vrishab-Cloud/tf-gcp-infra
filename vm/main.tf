@@ -3,20 +3,10 @@ resource "google_service_account" "service_account" {
   display_name = var.service_account_name
 }
 
-resource "google_project_iam_binding" "logging" {
-  project = var.gcp_project_id
-  role    = "roles/logging.admin"
-
-  members = [
-    "serviceAccount:${google_service_account.service_account.email}",
-  ]
-
-  depends_on = [google_service_account.service_account]
-}
-
-resource "google_project_iam_binding" "monitoring" {
-  project = var.gcp_project_id
-  role    = "roles/monitoring.metricWriter"
+resource "google_project_iam_binding" "application-roles" {
+  for_each = var.roles
+  project  = var.gcp_project_id
+  role     = each.key
 
   members = [
     "serviceAccount:${google_service_account.service_account.email}",
