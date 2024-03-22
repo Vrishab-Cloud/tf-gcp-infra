@@ -27,6 +27,16 @@
 
         gcloud services enable servicenetworking.googleapis.com --project=$PROJECT_ID
 
+        gcloud services enable cloudbuild.googleapis.com --project=$PROJECT_ID
+
+        gcloud services enable cloudfunctions.googleapis.com --project=$PROJECT_ID
+
+        gcloud services enable pubsub.googleapis.com --project=$PROJECT_ID
+
+        gcloud services enable eventarc.googleapis.com --project=$PROJECT_ID
+
+        gcloud services enable  run.googleapis.com --project=$PROJECT_ID
+
 7) Initialize terraform
         
         terraform init
