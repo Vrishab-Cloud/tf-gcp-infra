@@ -87,6 +87,7 @@ module "vm" {
       echo "PROD_DB_PASS=${module.sql.db_instance_password}" >> /tmp/.env
       echo "PROD_HOST=${google_compute_address.internal_ip.address}" >> /tmp/.env
       echo "NODE_ENV=production" >> /tmp/.env
+      echo "JWT_SECRET=secret" >> /tmp/.env
 
       mv /tmp/.env /opt/webapp/app
       chown csye6225:csye6225 /opt/webapp/app/.env

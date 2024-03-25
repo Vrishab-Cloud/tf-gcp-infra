@@ -58,21 +58,8 @@ resource "google_compute_firewall" "allow_db" {
   destination_ranges = [var.db_ip_cidr]
 }
 
-# resource "google_compute_firewall" "deny_others_ingress" {
-#   name    = "webapp-firewall-others-ingress"
-#   network = google_compute_network.vpc_network.id
-
-#   deny {
-#     protocol = "all"
-#   }
-
-#   priority      = 65534
-#   direction     = "INGRESS"
-#   source_ranges = ["0.0.0.0/0"]
-# }
-
-resource "google_compute_firewall" "deny_others_egress" {
-  name    = "webapp-firewall-others-egress"
+resource "google_compute_firewall" "deny_others_ingress" {
+  name    = "webapp-firewall-others-ingress"
   network = google_compute_network.vpc_network.id
 
   deny {
@@ -80,6 +67,6 @@ resource "google_compute_firewall" "deny_others_egress" {
   }
 
   priority      = 65534
-  direction     = "EGRESS"
-  source_ranges = [var.webapp_ip_cidr]
+  direction     = "INGRESS"
+  source_ranges = ["0.0.0.0/0"]
 }

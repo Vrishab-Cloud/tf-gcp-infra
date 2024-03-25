@@ -34,7 +34,11 @@ variable "vm_configs" {
     logger_name     = optional(string, "logger")
     roles           = optional(set(string))
   })
+}
 
+variable "jwt_secret" {
+  type = string
+  default = "3cd97e8bdaadb782e849a1043a80b639b1c3054c7f199f3d6cee3c0304c00f31"
 }
 
 variable "internal_ip_address" {
