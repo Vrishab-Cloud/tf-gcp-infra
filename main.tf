@@ -47,6 +47,7 @@ resource "google_compute_address" "internal_ip" {
   subnetwork   = module.vpc.db_subnet_name
   region       = var.gcp_region
 }
+
 data "google_sql_database_instance" "mysql_instance" {
   name = module.sql.db_instance_name
 }
@@ -90,7 +91,6 @@ module "pubsub" {
     domain_name = var.domain_name
     api_key     = var.mail_api_key
   }
-  depends_on = [module.sql, google_compute_address.internal_ip]
 }
 
 module "vm" {
@@ -132,7 +132,7 @@ module "vm" {
       systemctl restart google-cloud-ops-agent
 
       EOT
-  depends_on             = [google_compute_address.internal_ip, module.sql, module.vpc, module.pubsub]
+  depends_on             = [module.sql, module.vpc, module.pubsub]
 }
 
 resource "google_dns_record_set" "default" {
