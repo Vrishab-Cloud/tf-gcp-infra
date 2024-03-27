@@ -13,13 +13,16 @@ provider "google" {
 }
 
 module "vpc" {
-  source         = "./vpc"
-  name           = var.vpc_configs.name
-  webapp_ip_cidr = var.vpc_configs.webapp_ip_cidr
-  db_ip_cidr     = var.vpc_configs.db_ip_cidr
-  routing_mode   = var.vpc_configs.routing_mode
-  region         = var.vpc_configs.region
-  webapp_tags    = var.vpc_configs.webapp_tags
+  source                 = "./vpc"
+  name                   = var.vpc_configs.name
+  webapp_ip_cidr         = var.vpc_configs.webapp_ip_cidr
+  db_ip_cidr             = var.vpc_configs.db_ip_cidr
+  routing_mode           = var.vpc_configs.routing_mode
+  region                 = var.vpc_configs.region
+  webapp_tags            = var.vpc_configs.webapp_tags
+  connector_name         = var.vpc_configs.connector_name
+  connector_ip_range     = var.vpc_configs.connector_ip_range
+  connector_machine_type = var.vpc_configs.connector_machine_type
 }
 
 module "sql" {
@@ -48,7 +51,6 @@ data "google_sql_database_instance" "mysql_instance" {
   name = module.sql.db_instance_name
 }
 
-
 resource "google_compute_forwarding_rule" "forwarding_rule" {
   name                  = var.forwarding_rule_name
   target                = data.google_sql_database_instance.mysql_instance.psc_service_attachment_link
@@ -56,6 +58,39 @@ resource "google_compute_forwarding_rule" "forwarding_rule" {
   ip_address            = google_compute_address.internal_ip.self_link
   load_balancing_scheme = ""
   region                = var.gcp_region
+}
+
+data "google_dns_managed_zone" "dns_zone" {
+  name = var.dns_zone_name
+}
+
+module "pubsub" {
+  source                 = "./pubsub"
+  project_id             = var.gcp_project
+  region                 = var.gcp_region
+  mail_api_key           = var.mail_api_key
+  service_account_id     = var.pubsub_configs.service_account_id
+  sub_expire_ttl         = var.pubsub_configs.sub_expire_ttl
+  dns_name               = data.google_dns_managed_zone.dns_zone.dns_name
+  topic_name             = var.pubsub_configs.topic_name
+  function_name          = var.pubsub_configs.function_name
+  msg_retention_duration = var.pubsub_configs.msg_retention_duration
+  available_memory       = var.pubsub_configs.available_memory
+  runtime                = var.pubsub_configs.runtime
+  entry_point            = var.pubsub_configs.entry_point
+  bucket_name            = var.pubsub_configs.bucket_name
+  bucket_object_name     = var.pubsub_configs.bucket_object_name
+  roles                  = var.pubsub_configs.roles
+  vpc_connector          = module.vpc.db_vpc_connector
+  env_config = {
+    db_name     = module.sql.db_name
+    db_user     = module.sql.db_instance_user
+    db_pass     = module.sql.db_instance_password
+    db_host     = google_compute_address.internal_ip.address
+    domain_name = var.domain_name
+    api_key     = var.mail_api_key
+  }
+  depends_on = [module.sql, google_compute_address.internal_ip]
 }
 
 module "vm" {
@@ -87,25 +122,25 @@ module "vm" {
       echo "PROD_DB_PASS=${module.sql.db_instance_password}" >> /tmp/.env
       echo "PROD_HOST=${google_compute_address.internal_ip.address}" >> /tmp/.env
       echo "NODE_ENV=production" >> /tmp/.env
-      echo "JWT_SECRET=secret" >> /tmp/.env
+      echo "GCP_PROJECT=${var.gcp_project}" >> /tmp/.env
+      echo "TOPIC=${module.pubsub.topic_name}" >> /tmp/.env
 
       mv /tmp/.env /opt/webapp/app
       chown csye6225:csye6225 /opt/webapp/app/.env
 
       systemctl start webapp
       systemctl restart google-cloud-ops-agent
-      
+
       EOT
-  depends_on             = [google_compute_address.internal_ip]
+  depends_on             = [google_compute_address.internal_ip, module.sql, module.vpc, module.pubsub]
 }
 
-data "google_dns_managed_zone" "dns_zone" {
-  name = var.dns_zone_name
-}
 resource "google_dns_record_set" "default" {
   managed_zone = data.google_dns_managed_zone.dns_zone.name
   name         = data.google_dns_managed_zone.dns_zone.dns_name
   type         = "A"
   rrdatas      = [module.vm.vm_external_ip]
   ttl          = var.dns_record_ttl
+
+  depends_on = [module.vm]
 }

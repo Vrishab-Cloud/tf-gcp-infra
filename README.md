@@ -37,6 +37,8 @@
 
         gcloud services enable  run.googleapis.com --project=$PROJECT_ID
 
+        gcloud services enable vpcaccess.googleapis.com --project=$PROJECT_ID
+
 7) Initialize terraform
         
         terraform init

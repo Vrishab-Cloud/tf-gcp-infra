@@ -70,3 +70,14 @@ resource "google_compute_firewall" "deny_others_ingress" {
   direction     = "INGRESS"
   source_ranges = ["0.0.0.0/0"]
 }
+
+resource "google_vpc_access_connector" "db_connector" {
+  name          = var.connector_name
+  ip_cidr_range = var.connector_ip_range
+  network       = google_compute_network.vpc_network.name
+  machine_type  = "f1-micro"
+  min_instances = 2
+  max_instances = 3
+
+  depends_on = [google_compute_network.vpc_network]
+}

@@ -22,3 +22,15 @@ variable "routing_mode" {
 variable "webapp_tags" {
   type = list(string)
 }
+
+variable "connector_name" {
+  type = string
+}
+
+variable "connector_ip_range" {
+  type = string
+}
+
+variable "connector_machine_type" {
+  type = string
+}

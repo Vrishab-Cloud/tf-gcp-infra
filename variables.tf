@@ -11,12 +11,15 @@ variable "gcp_region" {
 #VPC
 variable "vpc_configs" {
   type = object({
-    name           = string
-    webapp_ip_cidr = string
-    db_ip_cidr     = string
-    routing_mode   = string
-    region         = optional(string, "us-east1")
-    webapp_tags    = list(string)
+    name                   = string
+    webapp_ip_cidr         = string
+    db_ip_cidr             = string
+    routing_mode           = string
+    region                 = optional(string, "us-east1")
+    webapp_tags            = list(string)
+    connector_ip_range     = string
+    connector_name         = string
+    connector_machine_type = optional(string, "f1-micro")
   })
 }
 
@@ -34,11 +37,6 @@ variable "vm_configs" {
     logger_name     = optional(string, "logger")
     roles           = optional(set(string))
   })
-}
-
-variable "jwt_secret" {
-  type = string
-  default = "3cd97e8bdaadb782e849a1043a80b639b1c3054c7f199f3d6cee3c0304c00f31"
 }
 
 variable "internal_ip_address" {
@@ -74,6 +72,32 @@ variable "dns_zone_name" {
   type = string
 }
 
+variable "domain_name" {
+  type = string
+}
+
 variable "dns_record_ttl" {
   type = number
+}
+
+variable "pubsub_configs" {
+  type = object({
+    topic_name             = string
+    msg_retention_duration = string
+    sub_expire_ttl         = string
+    region                 = optional(string, "us-east1")
+    function_name          = optional(string, "serverless")
+    service_account_id     = string
+    available_memory       = string
+    runtime                = string
+    entry_point            = string
+    bucket_name            = string
+    bucket_object_name     = string
+    roles                  = set(string)
+  })
+}
+
+
+variable "mail_api_key" {
+  type = string
 }

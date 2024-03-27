@@ -13,3 +13,7 @@ output "vpc_id" {
 output "webapp_firewall_tags" {
   value = var.webapp_tags
 }
+
+output "db_vpc_connector" {
+  value = google_vpc_access_connector.db_connector.name
+}
