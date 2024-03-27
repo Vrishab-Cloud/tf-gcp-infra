@@ -126,6 +126,7 @@ module "vm" {
       echo "NODE_ENV=production" >> /tmp/.env
       echo "GCP_PROJECT=${var.gcp_project}" >> /tmp/.env
       echo "TOPIC=${module.pubsub.topic_name}" >> /tmp/.env
+      echo "EMAIL_LINK_TIMEOUT=${var.email_link_timeout}" >> /tmp/.env
 
       mv /tmp/.env /opt/webapp/app
       chown csye6225:csye6225 /opt/webapp/app/.env

@@ -97,7 +97,10 @@ variable "pubsub_configs" {
   })
 }
 
-
 variable "mail_api_key" {
   type = string
+}
+
+variable "email_link_timeout" {
+  type = number
 }
