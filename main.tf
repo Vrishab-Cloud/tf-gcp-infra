@@ -91,6 +91,8 @@ module "pubsub" {
     domain_name = var.domain_name
     api_key     = var.mail_api_key
   }
+
+  depends_on = [google_compute_forwarding_rule.forwarding_rule]
 }
 
 module "vm" {
@@ -132,7 +134,7 @@ module "vm" {
       systemctl restart google-cloud-ops-agent
 
       EOT
-  depends_on             = [module.sql, module.vpc, module.pubsub]
+  depends_on             = [google_compute_address.internal_ip]
 }
 
 resource "google_dns_record_set" "default" {
@@ -141,6 +143,4 @@ resource "google_dns_record_set" "default" {
   type         = "A"
   rrdatas      = [module.vm.vm_external_ip]
   ttl          = var.dns_record_ttl
-
-  depends_on = [module.vm]
 }

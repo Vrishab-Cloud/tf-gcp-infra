@@ -70,7 +70,7 @@ resource "google_cloudfunctions2_function" "serverless" {
     event_type            = "google.cloud.pubsub.topic.v1.messagePublished"
     pubsub_topic          = google_pubsub_topic.pubsub_topic.id
     service_account_email = google_service_account.serverless.email
-    retry_policy = "RETRY_POLICY_RETRY"
+    retry_policy          = "RETRY_POLICY_RETRY"
   }
 
   depends_on = [google_service_account.serverless, google_pubsub_topic.pubsub_topic]
