@@ -139,6 +139,10 @@ variable "email_link_timeout" {
   type = number
 }
 
+variable "ssl_certificate_name" {
+  type = string
+}
+
 variable "lb_configs" {
   type = object({
     name                  = string

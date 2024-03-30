@@ -31,6 +31,10 @@ resource "google_compute_backend_service" "webapp" {
     balancing_mode  = var.balancing_mode
     capacity_scaler = 1.0
   }
+  log_config {
+    enable = true
+    sample_rate = 1
+  }
 
 }
 
@@ -39,9 +43,13 @@ resource "google_compute_url_map" "lb_url_map" {
   default_service = google_compute_backend_service.webapp.id
 }
 
-resource "google_compute_target_http_proxy" "lb_http_proxy" {
+resource "google_compute_target_https_proxy" "lb_https_proxy" {
   name    = "http-lb-proxy"
   url_map = google_compute_url_map.lb_url_map.id
+
+  ssl_certificates = [
+    var.ssl_certificate_name
+  ]
 }
 
 resource "google_compute_global_forwarding_rule" "default" {
@@ -49,6 +57,6 @@ resource "google_compute_global_forwarding_rule" "default" {
   ip_protocol           = "TCP"
   load_balancing_scheme = "EXTERNAL"
   port_range            = "443"
-  target                = google_compute_target_http_proxy.lb_http_proxy.id
+  target                = google_compute_target_https_proxy.lb_https_proxy.id
   ip_address            = google_compute_global_address.lb.id
 }

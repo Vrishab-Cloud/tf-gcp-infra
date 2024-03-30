@@ -53,3 +53,7 @@ variable "app_port" {
 variable "health_check_host" {
   type = string
 }
+
+variable "ssl_certificate_name" {
+  type = string
+}

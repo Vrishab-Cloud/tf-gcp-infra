@@ -149,6 +149,14 @@ module "vm-template" {
   depends_on             = [google_compute_address.internal_ip]
 }
 
+resource "google_compute_managed_ssl_certificate" "lb_default" {
+  name = var.ssl_certificate_name
+
+  managed {
+    domains = [var.domain_name]
+  }
+}
+
 module "load-balancer" {
   source                = "./load-balancer"
   name                  = var.lb_configs.name
@@ -167,7 +175,8 @@ module "load-balancer" {
   health_check_path               = var.autohealing_configs.health_check_path
   health_check_host               = google_compute_address.internal_ip.address
 
-  depends_on = [google_compute_address.internal_ip]
+  ssl_certificate_name = google_compute_managed_ssl_certificate.lb_default.name
+  depends_on           = [google_compute_address.internal_ip, google_compute_managed_ssl_certificate.lb_default]
 }
 
 resource "google_dns_record_set" "default" {

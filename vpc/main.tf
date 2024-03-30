@@ -41,8 +41,8 @@ resource "google_compute_firewall" "allow_http" {
 
   direction          = "INGRESS"
   target_tags        = concat(var.webapp_tags, ["http", "ingress"])
-  source_ranges      = ["0.0.0.0/0"]
-  destination_ranges = var.gfe_proxies
+  source_ranges      = var.gfe_proxies
+  destination_ranges = [var.webapp_ip_cidr]
 }
 
 resource "google_compute_firewall" "allow_db" {
