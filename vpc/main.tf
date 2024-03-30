@@ -42,7 +42,7 @@ resource "google_compute_firewall" "allow_http" {
   direction          = "INGRESS"
   target_tags        = concat(var.webapp_tags, ["http", "ingress"])
   source_ranges      = ["0.0.0.0/0"]
-  destination_ranges = [var.webapp_ip_cidr]
+  destination_ranges = var.gfe_proxies
 }
 
 resource "google_compute_firewall" "allow_db" {
@@ -69,6 +69,20 @@ resource "google_compute_firewall" "deny_others_ingress" {
   priority      = 65534
   direction     = "INGRESS"
   source_ranges = ["0.0.0.0/0"]
+}
+
+resource "google_compute_firewall" "allow_health_check" {
+  name      = "webap-firewall-health-check"
+  direction = "INGRESS"
+  network   = google_compute_network.vpc_network.id
+
+  allow {
+    ports    = ["80"]
+    protocol = "tcp"
+  }
+
+  source_ranges = var.gfe_proxies
+  target_tags   = concat(var.webapp_tags, ["allow-health-check"])
 }
 
 resource "google_vpc_access_connector" "db_connector" {

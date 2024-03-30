@@ -1,15 +1,16 @@
-variable "name" {
-  description = "Name of the VM instance"
+# VM Template
+variable "prefix_name" {
+  description = "Prefix of the name of the VM instance template"
   type        = string
 }
 
 variable "machine_type" {
-  description = "Machine type for the VM"
+  description = "Machine type for the VM template"
   type        = string
 }
 
-variable "zone" {
-  description = "Zone for the VM"
+variable "region" {
+  description = "Zone for the VM template"
   type        = string
 }
 
@@ -65,4 +66,35 @@ variable "service_account_name" {
 
 variable "roles" {
   type = set(string)
+}
+
+#  Instance Group Manager 
+variable "group_manager_name" {
+  type = string
+}
+
+variable "app_port" {
+  type = number
+}
+
+#  Autoscaler
+variable "autoscaler_name" {
+  type = string
+}
+
+
+variable "max_replicas" {
+  type = number
+}
+
+variable "min_replicas" {
+  type = number
+}
+
+variable "autoscaler_cooldown_period" {
+  type = number
+}
+
+variable "autoscaler_cpu_utilization" {
+  type = number
 }

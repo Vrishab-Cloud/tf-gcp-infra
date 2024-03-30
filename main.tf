@@ -23,6 +23,7 @@ module "vpc" {
   connector_name         = var.vpc_configs.connector_name
   connector_ip_range     = var.vpc_configs.connector_ip_range
   connector_machine_type = var.vpc_configs.connector_machine_type
+  gfe_proxies            = var.gfe_proxies
 }
 
 module "sql" {
@@ -95,21 +96,31 @@ module "pubsub" {
   depends_on = [google_compute_forwarding_rule.forwarding_rule]
 }
 
-module "vm" {
-  source                 = "./vm"
-  gcp_project_id         = var.gcp_project
-  name                   = var.vm_configs.name
-  machine_type           = var.vm_configs.machine_type
-  zone                   = var.vm_configs.zone
-  boot_disk_image        = var.vm_configs.boot_disk_image
-  subnetwork             = module.vpc.webapp_subnet_name
-  boot_disk_size         = var.vm_configs.boot_disk_size
-  boot_disk_type         = var.vm_configs.boot_disk_type
-  tags                   = module.vpc.webapp_firewall_tags
-  network_tier           = var.vm_configs.network_tier
-  service_account_id     = var.vm_configs.logger_id
-  service_account_name   = var.vm_configs.logger_name
-  roles                  = var.vm_configs.roles
+module "vm-template" {
+  source               = "./vm-template"
+  gcp_project_id       = var.gcp_project
+  prefix_name          = var.vm_configs.name
+  machine_type         = var.vm_configs.machine_type
+  region               = var.vm_configs.region
+  boot_disk_image      = var.vm_configs.boot_disk_image
+  subnetwork           = module.vpc.webapp_subnet_name
+  boot_disk_size       = var.vm_configs.boot_disk_size
+  boot_disk_type       = var.vm_configs.boot_disk_type
+  tags                 = module.vpc.webapp_firewall_tags
+  network_tier         = var.vm_configs.network_tier
+  service_account_id   = var.vm_configs.logger_id
+  service_account_name = var.vm_configs.logger_name
+  roles                = var.vm_configs.roles
+  group_manager_name   = var.vm_configs.instance_manager_name
+
+  app_port = var.app_port
+
+  autoscaler_name            = var.autoscaler_configs.name
+  autoscaler_cpu_utilization = var.autoscaler_configs.cpu_utilization
+  autoscaler_cooldown_period = var.autoscaler_configs.cooldown_period
+  max_replicas               = var.autoscaler_configs.max_replicas
+  min_replicas               = var.autoscaler_configs.min_replicas
+
   startup_script_content = <<-EOT
       #!/bin/bash
 
@@ -138,10 +149,31 @@ module "vm" {
   depends_on             = [google_compute_address.internal_ip]
 }
 
+module "load-balancer" {
+  source                = "./load-balancer"
+  name                  = var.lb_configs.name
+  balancing_mode        = var.lb_configs.balancing_mode
+  load_balancing_scheme = var.lb_configs.load_balancing_scheme
+  protocol              = var.lb_configs.protocol
+  app_port              = var.app_port
+  port_name             = module.vm-template.port_name
+  instance_group        = module.vm-template.instance_group
+
+  autohealing_name                = var.autohealing_configs.name
+  autohealing_check_interval      = var.autohealing_configs.check_interval
+  autohealing_timeout             = var.autohealing_configs.timeout
+  autohealing_healthy_threshold   = var.autohealing_configs.healthy_threshold
+  autohealing_unhealthy_threshold = var.autohealing_configs.unhealthy_threshold
+  health_check_path               = var.autohealing_configs.health_check_path
+  health_check_host               = google_compute_address.internal_ip.address
+
+  depends_on = [google_compute_address.internal_ip]
+}
+
 resource "google_dns_record_set" "default" {
   managed_zone = data.google_dns_managed_zone.dns_zone.name
   name         = data.google_dns_managed_zone.dns_zone.dns_name
   type         = "A"
-  rrdatas      = [module.vm.vm_external_ip]
+  rrdatas      = [module.load-balancer.ip_address]
   ttl          = var.dns_record_ttl
 }

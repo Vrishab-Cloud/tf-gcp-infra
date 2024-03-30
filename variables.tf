@@ -23,12 +23,16 @@ variable "vpc_configs" {
   })
 }
 
+variable "gfe_proxies" {
+  type = list(string)
+}
+
 # VM
 variable "vm_configs" {
   type = object({
     name            = string
     machine_type    = string
-    zone            = optional(string, "us-east1-b")
+    region          = optional(string, "us-east1")
     boot_disk_image = string
     boot_disk_type  = string
     boot_disk_size  = number
@@ -36,6 +40,36 @@ variable "vm_configs" {
     logger_id       = optional(string, "logger")
     logger_name     = optional(string, "logger")
     roles           = optional(set(string))
+
+    instance_manager_name = string
+  })
+}
+
+# Autohealing
+variable "autohealing_configs" {
+  type = object({
+    name                = string
+    check_interval      = number
+    timeout             = number
+    healthy_threshold   = number
+    unhealthy_threshold = number
+    health_check_path   = optional(string, "/healthz")
+  })
+}
+
+variable "app_port" {
+  type    = number
+  default = 3000
+}
+
+
+variable "autoscaler_configs" {
+  type = object({
+    name            = string
+    max_replicas    = number
+    min_replicas    = number
+    cooldown_period = number
+    cpu_utilization = number
   })
 }
 
@@ -103,4 +137,13 @@ variable "mail_api_key" {
 
 variable "email_link_timeout" {
   type = number
+}
+
+variable "lb_configs" {
+  type = object({
+    name                  = string
+    load_balancing_scheme = string
+    protocol              = string
+    balancing_mode        = string
+  })
 }

@@ -34,3 +34,7 @@ variable "connector_ip_range" {
 variable "connector_machine_type" {
   type = string
 }
+
+variable "gfe_proxies" {
+  type = list(string)
+}
