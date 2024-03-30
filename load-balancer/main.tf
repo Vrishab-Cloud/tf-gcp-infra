@@ -32,7 +32,7 @@ resource "google_compute_backend_service" "webapp" {
     capacity_scaler = 1.0
   }
   log_config {
-    enable = true
+    enable      = true
     sample_rate = 1
   }
 
