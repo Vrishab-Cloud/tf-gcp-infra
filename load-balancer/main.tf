@@ -44,7 +44,7 @@ resource "google_compute_url_map" "lb_url_map" {
 }
 
 resource "google_compute_target_https_proxy" "lb_https_proxy" {
-  name    = "http-lb-proxy"
+  name    = "https-lb-proxy"
   url_map = google_compute_url_map.lb_url_map.id
 
   ssl_certificates = [
@@ -53,10 +53,10 @@ resource "google_compute_target_https_proxy" "lb_https_proxy" {
 }
 
 resource "google_compute_global_forwarding_rule" "default" {
-  name                  = "http-content-rule"
+  name                  = "https-content-rule"
   ip_protocol           = "TCP"
-  load_balancing_scheme = "EXTERNAL"
-  port_range            = "443"
+  load_balancing_scheme = var.load_balancing_scheme
+  port_range            = var.port_range
   target                = google_compute_target_https_proxy.lb_https_proxy.id
   ip_address            = google_compute_global_address.lb.id
 }

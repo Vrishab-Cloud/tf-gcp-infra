@@ -39,7 +39,8 @@ variable "vm_configs" {
     network_tier    = optional(string, "STANDARD")
     logger_id       = optional(string, "logger")
     logger_name     = optional(string, "logger")
-    roles           = optional(set(string))
+    roles           = set(string)
+    service_account_scopes = list(string)
 
     instance_manager_name = string
   })
@@ -149,5 +150,6 @@ variable "lb_configs" {
     load_balancing_scheme = string
     protocol              = string
     balancing_mode        = string
+    port_range            = optional(string, "443")
   })
 }

@@ -10,6 +10,10 @@ variable "load_balancing_scheme" {
   type = string
 }
 
+variable "port_range" {
+  type = string
+}
+
 variable "protocol" {
   type = string
 }

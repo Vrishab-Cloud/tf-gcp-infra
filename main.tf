@@ -110,6 +110,7 @@ module "vm-template" {
   network_tier         = var.vm_configs.network_tier
   service_account_id   = var.vm_configs.logger_id
   service_account_name = var.vm_configs.logger_name
+  service_account_scopes = var.vm_configs.service_account_scopes
   roles                = var.vm_configs.roles
   group_manager_name   = var.vm_configs.instance_manager_name
 
@@ -165,6 +166,7 @@ module "load-balancer" {
   protocol              = var.lb_configs.protocol
   app_port              = var.app_port
   port_name             = module.vm-template.port_name
+  port_range            = var.lb_configs.port_range
   instance_group        = module.vm-template.instance_group
 
   autohealing_name                = var.autohealing_configs.name

@@ -59,6 +59,10 @@ variable "service_account_id" {
   description = "Id for logger service account"
 }
 
+variable "service_account_scopes" {
+  type = list(string)
+}
+
 variable "service_account_name" {
   type        = string
   description = "Display name for logger service account"
