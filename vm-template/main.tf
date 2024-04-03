@@ -43,7 +43,7 @@ resource "google_compute_region_instance_template" "instance_template" {
   }
 
   service_account {
-    email = google_service_account.service_account.email
+    email  = google_service_account.service_account.email
     scopes = var.service_account_scopes
   }
 

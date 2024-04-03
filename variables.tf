@@ -30,16 +30,16 @@ variable "gfe_proxies" {
 # VM
 variable "vm_configs" {
   type = object({
-    name            = string
-    machine_type    = string
-    region          = optional(string, "us-east1")
-    boot_disk_image = string
-    boot_disk_type  = string
-    boot_disk_size  = number
-    network_tier    = optional(string, "STANDARD")
-    logger_id       = optional(string, "logger")
-    logger_name     = optional(string, "logger")
-    roles           = set(string)
+    name                   = string
+    machine_type           = string
+    region                 = optional(string, "us-east1")
+    boot_disk_image        = string
+    boot_disk_type         = string
+    boot_disk_size         = number
+    network_tier           = optional(string, "STANDARD")
+    logger_id              = optional(string, "logger")
+    logger_name            = optional(string, "logger")
+    roles                  = set(string)
     service_account_scopes = list(string)
 
     instance_manager_name = string

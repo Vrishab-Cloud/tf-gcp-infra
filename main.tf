@@ -97,22 +97,22 @@ module "pubsub" {
 }
 
 module "vm-template" {
-  source               = "./vm-template"
-  gcp_project_id       = var.gcp_project
-  prefix_name          = var.vm_configs.name
-  machine_type         = var.vm_configs.machine_type
-  region               = var.vm_configs.region
-  boot_disk_image      = var.vm_configs.boot_disk_image
-  subnetwork           = module.vpc.webapp_subnet_name
-  boot_disk_size       = var.vm_configs.boot_disk_size
-  boot_disk_type       = var.vm_configs.boot_disk_type
-  tags                 = module.vpc.webapp_firewall_tags
-  network_tier         = var.vm_configs.network_tier
-  service_account_id   = var.vm_configs.logger_id
-  service_account_name = var.vm_configs.logger_name
+  source                 = "./vm-template"
+  gcp_project_id         = var.gcp_project
+  prefix_name            = var.vm_configs.name
+  machine_type           = var.vm_configs.machine_type
+  region                 = var.vm_configs.region
+  boot_disk_image        = var.vm_configs.boot_disk_image
+  subnetwork             = module.vpc.webapp_subnet_name
+  boot_disk_size         = var.vm_configs.boot_disk_size
+  boot_disk_type         = var.vm_configs.boot_disk_type
+  tags                   = module.vpc.webapp_firewall_tags
+  network_tier           = var.vm_configs.network_tier
+  service_account_id     = var.vm_configs.logger_id
+  service_account_name   = var.vm_configs.logger_name
   service_account_scopes = var.vm_configs.service_account_scopes
-  roles                = var.vm_configs.roles
-  group_manager_name   = var.vm_configs.instance_manager_name
+  roles                  = var.vm_configs.roles
+  group_manager_name     = var.vm_configs.instance_manager_name
 
   app_port = var.app_port
 
