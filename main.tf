@@ -96,6 +96,20 @@ module "pubsub" {
   depends_on = [google_compute_forwarding_rule.forwarding_rule]
 }
 
+resource "google_compute_health_check" "autohealing" {
+  name                = var.autohealing_configs.name
+  check_interval_sec  = var.autohealing_configs.check_interval
+  timeout_sec         = var.autohealing_configs.timeout
+  healthy_threshold   = var.autohealing_configs.healthy_threshold
+  unhealthy_threshold = var.autohealing_configs.unhealthy_threshold
+
+  http_health_check {
+    request_path = var.autohealing_configs.health_check_path
+    port         = var.app_port
+    host         = google_compute_address.internal_ip.address
+  }
+}
+
 module "vm-template" {
   source                 = "./vm-template"
   gcp_project_id         = var.gcp_project
@@ -113,8 +127,8 @@ module "vm-template" {
   service_account_scopes = var.vm_configs.service_account_scopes
   roles                  = var.vm_configs.roles
   group_manager_name     = var.vm_configs.instance_manager_name
-
-  app_port = var.app_port
+  health_check_id        = google_compute_health_check.autohealing.id
+  app_port               = var.app_port
 
   autoscaler_name            = var.autoscaler_configs.name
   autoscaler_cpu_utilization = var.autoscaler_configs.cpu_utilization
@@ -164,21 +178,12 @@ module "load-balancer" {
   balancing_mode        = var.lb_configs.balancing_mode
   load_balancing_scheme = var.lb_configs.load_balancing_scheme
   protocol              = var.lb_configs.protocol
-  app_port              = var.app_port
   port_name             = module.vm-template.port_name
   port_range            = var.lb_configs.port_range
   instance_group        = module.vm-template.instance_group
-
-  autohealing_name                = var.autohealing_configs.name
-  autohealing_check_interval      = var.autohealing_configs.check_interval
-  autohealing_timeout             = var.autohealing_configs.timeout
-  autohealing_healthy_threshold   = var.autohealing_configs.healthy_threshold
-  autohealing_unhealthy_threshold = var.autohealing_configs.unhealthy_threshold
-  health_check_path               = var.autohealing_configs.health_check_path
-  health_check_host               = google_compute_address.internal_ip.address
-
-  ssl_certificate_name = google_compute_managed_ssl_certificate.lb_default.name
-  depends_on           = [google_compute_address.internal_ip, google_compute_managed_ssl_certificate.lb_default]
+  health_check_id       = google_compute_health_check.autohealing.id
+  ssl_certificate_name  = google_compute_managed_ssl_certificate.lb_default.name
+  depends_on            = [google_compute_address.internal_ip, google_compute_managed_ssl_certificate.lb_default]
 }
 
 resource "google_dns_record_set" "default" {

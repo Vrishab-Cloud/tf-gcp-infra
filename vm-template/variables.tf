@@ -81,6 +81,10 @@ variable "app_port" {
   type = number
 }
 
+variable "health_check_id" {
+  type = string
+}
+
 #  Autoscaler
 variable "autoscaler_name" {
   type = string

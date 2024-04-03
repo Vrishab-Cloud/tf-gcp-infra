@@ -3,24 +3,12 @@ resource "google_compute_global_address" "lb" {
   ip_version = "IPV4"
 }
 
-resource "google_compute_health_check" "autohealing" {
-  name                = var.autohealing_name
-  check_interval_sec  = var.autohealing_check_interval
-  timeout_sec         = var.autohealing_timeout
-  healthy_threshold   = var.autohealing_healthy_threshold
-  unhealthy_threshold = var.autohealing_unhealthy_threshold
 
-  http_health_check {
-    request_path = var.health_check_path
-    port         = var.app_port
-    host         = var.health_check_host
-  }
-}
 
 resource "google_compute_backend_service" "webapp" {
   name                            = "webapp-backend-service"
   connection_draining_timeout_sec = 180
-  health_checks                   = [google_compute_health_check.autohealing.id]
+  health_checks                   = [var.health_check_id]
   load_balancing_scheme           = var.load_balancing_scheme
   port_name                       = var.port_name
   protocol                        = var.protocol

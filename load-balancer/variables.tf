@@ -26,35 +26,7 @@ variable "instance_group" {
   type = string
 }
 
-variable "autohealing_name" {
-  type = string
-}
-
-variable "autohealing_check_interval" {
-  type = number
-}
-
-variable "autohealing_timeout" {
-  type = number
-}
-
-variable "autohealing_healthy_threshold" {
-  type = number
-}
-
-variable "autohealing_unhealthy_threshold" {
-  type = number
-}
-
-variable "health_check_path" {
-  type = string
-}
-
-variable "app_port" {
-  type = number
-}
-
-variable "health_check_host" {
+variable "health_check_id" {
   type = string
 }
 

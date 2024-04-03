@@ -79,4 +79,9 @@ resource "google_compute_region_instance_group_manager" "instance_group_manager"
     name = "http"
     port = var.app_port
   }
+
+  auto_healing_policies {
+    health_check      = var.health_check_id
+    initial_delay_sec = 300
+  }
 }
