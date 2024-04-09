@@ -13,7 +13,7 @@ resource "google_sql_database_instance" "mysql_instance" {
   name             = "${var.instance_name_prefix}-${random_id.db_name_suffix.dec}"
   region           = var.instance_region
   database_version = var.db_version
-
+  encryption_key_name = var.encryption_id
   settings {
     tier = var.tier
 

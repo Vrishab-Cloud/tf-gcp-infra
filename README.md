@@ -35,9 +35,11 @@
 
         gcloud services enable eventarc.googleapis.com --project=$PROJECT_ID
 
-        gcloud services enable  run.googleapis.com --project=$PROJECT_ID
+        gcloud services enable run.googleapis.com --project=$PROJECT_ID
 
         gcloud services enable vpcaccess.googleapis.com --project=$PROJECT_ID
+
+        gcloud services enable cloudkms.googleapis.com --project=$PROJECT_ID
 
 7) Initialize terraform
         

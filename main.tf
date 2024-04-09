@@ -7,6 +7,17 @@ terraform {
   }
 }
 
+module "cmek" {
+  source = "./cmek"
+  project_id = var.gcp_project
+  location = var.cmek_configs.location
+  sql_key_name = var.cmek_configs.sql_key_name
+  vm_key_name = var.cmek_configs.vm_key_name
+  bucket_key_name = var.cmek_configs.bucket_key_name
+  key_ring_name = var.cmek_configs.key_ring_name
+  rotation_period = var.cmek_configs.rotation_period
+}
+
 provider "google" {
   region  = var.gcp_region
   project = var.gcp_project
@@ -39,6 +50,10 @@ module "sql" {
   consumer_projects    = var.sql_configs.consumer_projects
   sql_user             = var.sql_configs.sql_user
   tier                 = var.sql_configs.db_tier
+  encryption_id = module.cmek.sql_key_id
+
+  depends_on = [ module.cmek ]
+
 }
 
 resource "google_compute_address" "internal_ip" {
@@ -93,7 +108,7 @@ module "pubsub" {
     api_key     = var.mail_api_key
   }
 
-  depends_on = [google_compute_forwarding_rule.forwarding_rule]
+  depends_on = [ module.cmek ]
 }
 
 resource "google_compute_health_check" "autohealing" {
@@ -135,7 +150,7 @@ module "vm-template" {
   autoscaler_cooldown_period = var.autoscaler_configs.cooldown_period
   max_replicas               = var.autoscaler_configs.max_replicas
   min_replicas               = var.autoscaler_configs.min_replicas
-
+  encryption_id = module.cmek.vm_key_id
   startup_script_content = <<-EOT
       #!/bin/bash
 
@@ -161,7 +176,7 @@ module "vm-template" {
       systemctl restart google-cloud-ops-agent
 
       EOT
-  depends_on             = [google_compute_address.internal_ip]
+  depends_on             = [google_compute_address.internal_ip, module.cmek]
 }
 
 resource "google_compute_managed_ssl_certificate" "lb_default" {

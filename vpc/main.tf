@@ -71,19 +71,6 @@ resource "google_compute_firewall" "deny_others_ingress" {
   source_ranges = ["0.0.0.0/0"]
 }
 
-resource "google_compute_firewall" "allow_health_check" {
-  name      = "webap-firewall-health-check"
-  direction = "INGRESS"
-  network   = google_compute_network.vpc_network.id
-
-  allow {
-    ports    = ["80"]
-    protocol = "tcp"
-  }
-
-  source_ranges = var.gfe_proxies
-  target_tags   = concat(var.webapp_tags, ["allow-health-check"])
-}
 
 resource "google_vpc_access_connector" "db_connector" {
   name          = var.connector_name

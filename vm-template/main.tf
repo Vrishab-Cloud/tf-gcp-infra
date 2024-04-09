@@ -27,6 +27,13 @@ resource "google_compute_region_instance_template" "instance_template" {
     boot         = true
     disk_type    = var.boot_disk_type
     disk_size_gb = var.boot_disk_size
+
+    disk_encryption_key {
+      kms_key_self_link = var.encryption_id
+    }
+    source_image_encryption_key {
+      kms_key_self_link = var.encryption_id
+    }
   }
 
   network_interface {
@@ -48,6 +55,8 @@ resource "google_compute_region_instance_template" "instance_template" {
   }
 
   metadata_startup_script = var.startup_script_content
+
+  depends_on = [ google_project_iam_binding.application-roles ]
 }
 
 

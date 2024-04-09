@@ -153,3 +153,14 @@ variable "lb_configs" {
     port_range            = optional(string, "443")
   })
 }
+
+variable "cmek_configs" {
+  type = object({
+    key_ring_name = string
+    location = optional(string, "us-east1")
+    sql_key_name = string
+    bucket_key_name = string
+    vm_key_name = string
+    rotation_period = string
+  })
+}
