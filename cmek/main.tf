@@ -1,7 +1,7 @@
 resource "google_kms_key_ring" "key_ring" {
   name     = var.key_ring_name
   location = var.location
-   lifecycle {
+  lifecycle {
     prevent_destroy = false
   }
 }
@@ -9,40 +9,40 @@ resource "google_kms_key_ring" "key_ring" {
 
 resource "google_kms_crypto_key" "sql_key" {
   name = var.sql_key_name
-  
-  key_ring = google_kms_key_ring.key_ring.id
+
+  key_ring        = google_kms_key_ring.key_ring.id
   rotation_period = var.rotation_period
 
   lifecycle {
-     prevent_destroy = false
+    prevent_destroy = false
   }
 }
 
 
 resource "google_kms_crypto_key" "vm_key" {
   name = var.vm_key_name
-  
-  key_ring = google_kms_key_ring.key_ring.id
+
+  key_ring        = google_kms_key_ring.key_ring.id
   rotation_period = var.rotation_period
 
   lifecycle {
-     prevent_destroy = false
+    prevent_destroy = false
   }
 }
 
 resource "google_kms_crypto_key" "bucket_key" {
   name = var.bucket_key_name
-  
-  key_ring = google_kms_key_ring.key_ring.id
+
+  key_ring        = google_kms_key_ring.key_ring.id
   rotation_period = var.rotation_period
 
   lifecycle {
-     prevent_destroy = false
+    prevent_destroy = false
   }
 }
 
 resource "google_project_service_identity" "gcp_sa_cloud_sql" {
-  project = var.project_id
+  project  = var.project_id
   provider = google-beta
   service  = "sqladmin.googleapis.com"
 }

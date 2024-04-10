@@ -156,11 +156,11 @@ variable "lb_configs" {
 
 variable "cmek_configs" {
   type = object({
-    key_ring_name = string
-    location = optional(string, "us-east1")
-    sql_key_name = string
+    key_ring_name   = string
+    location        = optional(string, "us-east1")
+    sql_key_name    = string
     bucket_key_name = string
-    vm_key_name = string
+    vm_key_name     = string
     rotation_period = string
   })
 }

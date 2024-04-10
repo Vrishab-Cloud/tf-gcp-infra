@@ -56,7 +56,7 @@ resource "google_compute_region_instance_template" "instance_template" {
 
   metadata_startup_script = var.startup_script_content
 
-  depends_on = [ google_project_iam_binding.application-roles ]
+  depends_on = [google_project_iam_binding.application-roles]
 }
 
 
