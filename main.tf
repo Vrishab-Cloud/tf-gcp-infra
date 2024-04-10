@@ -62,6 +62,8 @@ resource "google_compute_address" "internal_ip" {
   address      = var.internal_ip_address
   subnetwork   = module.vpc.db_subnet_name
   region       = var.gcp_region
+
+  depends_on = [module.vpc]
 }
 
 data "google_sql_database_instance" "mysql_instance" {
@@ -75,6 +77,8 @@ resource "google_compute_forwarding_rule" "forwarding_rule" {
   ip_address            = google_compute_address.internal_ip.self_link
   load_balancing_scheme = ""
   region                = var.gcp_region
+
+  depends_on = [module.vpc]
 }
 
 data "google_dns_managed_zone" "dns_zone" {
@@ -108,7 +112,7 @@ module "pubsub" {
     api_key     = var.mail_api_key
   }
 
-  depends_on = [module.cmek]
+  depends_on = [module.cmek, module.vpc, module.sql, google_compute_address.internal_ip]
 }
 
 resource "google_compute_health_check" "autohealing" {
@@ -123,6 +127,8 @@ resource "google_compute_health_check" "autohealing" {
     port         = var.app_port
     host         = google_compute_address.internal_ip.address
   }
+
+  depends_on = [google_compute_address.internal_ip]
 }
 
 module "vm-template" {
@@ -176,7 +182,7 @@ module "vm-template" {
       systemctl restart google-cloud-ops-agent
 
       EOT
-  depends_on                 = [google_compute_address.internal_ip, module.cmek]
+  depends_on                 = [module.vpc, google_compute_address.internal_ip, module.cmek, module.sql, google_compute_health_check.autohealing]
 }
 
 resource "google_compute_managed_ssl_certificate" "lb_default" {
@@ -198,7 +204,7 @@ module "load-balancer" {
   instance_group        = module.vm-template.instance_group
   health_check_id       = google_compute_health_check.autohealing.id
   ssl_certificate_name  = google_compute_managed_ssl_certificate.lb_default.name
-  depends_on            = [google_compute_address.internal_ip, google_compute_managed_ssl_certificate.lb_default]
+  depends_on            = [module.vm-template, google_compute_managed_ssl_certificate.lb_default]
 }
 
 resource "google_dns_record_set" "default" {
@@ -207,4 +213,6 @@ resource "google_dns_record_set" "default" {
   type         = "A"
   rrdatas      = [module.load-balancer.ip_address]
   ttl          = var.dns_record_ttl
+
+  depends_on = [module.load-balancer]
 }

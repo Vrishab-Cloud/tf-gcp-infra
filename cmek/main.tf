@@ -16,6 +16,8 @@ resource "google_kms_crypto_key" "sql_key" {
   lifecycle {
     prevent_destroy = false
   }
+
+  depends_on = [google_kms_key_ring.key_ring]
 }
 
 
@@ -28,6 +30,8 @@ resource "google_kms_crypto_key" "vm_key" {
   lifecycle {
     prevent_destroy = false
   }
+
+  depends_on = [google_kms_key_ring.key_ring]
 }
 
 resource "google_kms_crypto_key" "bucket_key" {
@@ -39,6 +43,8 @@ resource "google_kms_crypto_key" "bucket_key" {
   lifecycle {
     prevent_destroy = false
   }
+
+  depends_on = [google_kms_key_ring.key_ring]
 }
 
 resource "google_project_service_identity" "gcp_sa_cloud_sql" {
