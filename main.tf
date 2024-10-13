@@ -216,3 +216,5 @@ resource "google_dns_record_set" "default" {
 
   depends_on = [module.load-balancer]
 }
+
+resource "demo" "demo" {}
