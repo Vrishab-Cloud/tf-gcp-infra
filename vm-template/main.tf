@@ -18,7 +18,6 @@ resource "google_project_iam_binding" "application-roles" {
 resource "google_compute_region_instance_template" "instance_template" {
   name_prefix  = var.prefix_name
   machine_type = var.machine_type
-  region       = var.region
 
   tags = var.tags
 
@@ -27,13 +26,6 @@ resource "google_compute_region_instance_template" "instance_template" {
     boot         = true
     disk_type    = var.boot_disk_type
     disk_size_gb = var.boot_disk_size
-
-    disk_encryption_key {
-      kms_key_self_link = var.encryption_id
-    }
-    source_image_encryption_key {
-      kms_key_self_link = var.encryption_id
-    }
   }
 
   network_interface {

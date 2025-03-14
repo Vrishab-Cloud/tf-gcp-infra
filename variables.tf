@@ -11,16 +11,26 @@ variable "gcp_region" {
 #VPC
 variable "vpc_configs" {
   type = object({
-    name                   = string
-    webapp_ip_cidr         = string
-    db_ip_cidr             = string
-    routing_mode           = string
-    region                 = optional(string, "us-east1")
-    webapp_tags            = list(string)
-    connector_ip_range     = string
-    connector_name         = string
-    connector_machine_type = optional(string, "f1-micro")
+    name           = string
+    webapp_ip_cidr = string
+    db_ip_cidr     = string
+    routing_mode   = string
+    region         = optional(string, "us-east1")
+    webapp_tags    = list(string)
+
   })
+}
+variable "connector_ip_range" {
+  type = string
+}
+
+variable "connector_name" {
+  type = string
+}
+
+variable "connector_machine_type" {
+  type    = string
+  default = "f1-micro"
 }
 
 variable "gfe_proxies" {
@@ -133,7 +143,8 @@ variable "pubsub_configs" {
 }
 
 variable "mail_api_key" {
-  type = string
+  type      = string
+  sensitive = true
 }
 
 variable "email_link_timeout" {
@@ -154,13 +165,13 @@ variable "lb_configs" {
   })
 }
 
-variable "cmek_configs" {
-  type = object({
-    key_ring_name   = string
-    location        = optional(string, "us-east1")
-    sql_key_name    = string
-    bucket_key_name = string
-    vm_key_name     = string
-    rotation_period = string
-  })
-}
+# variable "cmek_configs" {
+#   type = object({
+#     key_ring_name   = string
+#     location        = optional(string, "us-east1")
+#     sql_key_name    = string
+#     bucket_key_name = string
+#     vm_key_name     = string
+#     rotation_period = string
+#   })
+# }

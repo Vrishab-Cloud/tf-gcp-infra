@@ -2,20 +2,9 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~>5.0"
+      version = "5.38.0"
     }
   }
-}
-
-module "cmek" {
-  source          = "./cmek"
-  project_id      = var.gcp_project
-  location        = var.cmek_configs.location
-  sql_key_name    = var.cmek_configs.sql_key_name
-  vm_key_name     = var.cmek_configs.vm_key_name
-  bucket_key_name = var.cmek_configs.bucket_key_name
-  key_ring_name   = var.cmek_configs.key_ring_name
-  rotation_period = var.cmek_configs.rotation_period
 }
 
 provider "google" {
@@ -24,17 +13,14 @@ provider "google" {
 }
 
 module "vpc" {
-  source                 = "./vpc"
-  name                   = var.vpc_configs.name
-  webapp_ip_cidr         = var.vpc_configs.webapp_ip_cidr
-  db_ip_cidr             = var.vpc_configs.db_ip_cidr
-  routing_mode           = var.vpc_configs.routing_mode
-  region                 = var.vpc_configs.region
-  webapp_tags            = var.vpc_configs.webapp_tags
-  connector_name         = var.vpc_configs.connector_name
-  connector_ip_range     = var.vpc_configs.connector_ip_range
-  connector_machine_type = var.vpc_configs.connector_machine_type
-  gfe_proxies            = var.gfe_proxies
+  source         = "./vpc"
+  name           = var.vpc_configs.name
+  webapp_ip_cidr = var.vpc_configs.webapp_ip_cidr
+  db_ip_cidr     = var.vpc_configs.db_ip_cidr
+  routing_mode   = var.vpc_configs.routing_mode
+  region         = var.vpc_configs.region
+  webapp_tags    = var.vpc_configs.webapp_tags
+  gfe_proxies    = var.gfe_proxies
 }
 
 module "sql" {
@@ -50,20 +36,14 @@ module "sql" {
   consumer_projects    = var.sql_configs.consumer_projects
   sql_user             = var.sql_configs.sql_user
   tier                 = var.sql_configs.db_tier
-  encryption_id        = module.cmek.sql_key_id
-
-  depends_on = [module.cmek]
-
 }
 
 resource "google_compute_address" "internal_ip" {
   name         = var.internal_ip_name
   address_type = "INTERNAL"
   address      = var.internal_ip_address
-  subnetwork   = module.vpc.db_subnet_name
+  subnetwork   = module.vpc.db_subnet
   region       = var.gcp_region
-
-  depends_on = [module.vpc]
 }
 
 data "google_sql_database_instance" "mysql_instance" {
@@ -77,9 +57,18 @@ resource "google_compute_forwarding_rule" "forwarding_rule" {
   ip_address            = google_compute_address.internal_ip.self_link
   load_balancing_scheme = ""
   region                = var.gcp_region
-
-  depends_on = [module.vpc]
 }
+
+resource "google_vpc_access_connector" "db_connector" {
+  name          = var.connector_name
+  ip_cidr_range = var.connector_ip_range
+  network       = module.vpc.vpc_id
+  region        = var.gcp_region
+  machine_type  = var.connector_machine_type
+  min_instances = 2
+  max_instances = 3
+}
+
 
 data "google_dns_managed_zone" "dns_zone" {
   name = var.dns_zone_name
@@ -102,7 +91,7 @@ module "pubsub" {
   bucket_name            = var.pubsub_configs.bucket_name
   bucket_object_name     = var.pubsub_configs.bucket_object_name
   roles                  = var.pubsub_configs.roles
-  vpc_connector          = module.vpc.db_vpc_connector
+  vpc_connector          = google_vpc_access_connector.db_connector.id
   env_config = {
     db_name     = module.sql.db_name
     db_user     = module.sql.db_instance_user
@@ -111,8 +100,6 @@ module "pubsub" {
     domain_name = var.domain_name
     api_key     = var.mail_api_key
   }
-
-  depends_on = [module.cmek, module.vpc, module.sql, google_compute_address.internal_ip]
 }
 
 resource "google_compute_health_check" "autohealing" {
@@ -125,10 +112,8 @@ resource "google_compute_health_check" "autohealing" {
   http_health_check {
     request_path = var.autohealing_configs.health_check_path
     port         = var.app_port
-    host         = google_compute_address.internal_ip.address
+    host         = var.domain_name
   }
-
-  depends_on = [google_compute_address.internal_ip]
 }
 
 module "vm-template" {
@@ -138,7 +123,7 @@ module "vm-template" {
   machine_type           = var.vm_configs.machine_type
   region                 = var.vm_configs.region
   boot_disk_image        = var.vm_configs.boot_disk_image
-  subnetwork             = module.vpc.webapp_subnet_name
+  subnetwork             = module.vpc.webapp_subnet
   boot_disk_size         = var.vm_configs.boot_disk_size
   boot_disk_type         = var.vm_configs.boot_disk_type
   tags                   = module.vpc.webapp_firewall_tags
@@ -156,7 +141,6 @@ module "vm-template" {
   autoscaler_cooldown_period = var.autoscaler_configs.cooldown_period
   max_replicas               = var.autoscaler_configs.max_replicas
   min_replicas               = var.autoscaler_configs.min_replicas
-  encryption_id              = module.cmek.vm_key_id
   startup_script_content     = <<-EOT
       #!/bin/bash
 
@@ -168,21 +152,22 @@ module "vm-template" {
 
       echo "PROD_DB_NAME=${module.sql.db_name}" >> /tmp/.env
       echo "PROD_DB_USER=${module.sql.db_instance_user}" >> /tmp/.env
-      echo "PROD_DB_PASS=${module.sql.db_instance_password}" >> /tmp/.env
+      echo "PROD_DB_PASS=\"${module.sql.db_instance_password}\"" >> /tmp/.env
       echo "PROD_HOST=${google_compute_address.internal_ip.address}" >> /tmp/.env
       echo "NODE_ENV=production" >> /tmp/.env
       echo "GCP_PROJECT=${var.gcp_project}" >> /tmp/.env
       echo "TOPIC=${module.pubsub.topic_name}" >> /tmp/.env
+      
       echo "EMAIL_LINK_TIMEOUT=${var.email_link_timeout}" >> /tmp/.env
 
       mv /tmp/.env /opt/webapp/app
       chown csye6225:csye6225 /opt/webapp/app/.env
+      chmod 600 /opt/webapp/app/.env
 
       systemctl start webapp
       systemctl restart google-cloud-ops-agent
 
       EOT
-  depends_on                 = [module.vpc, google_compute_address.internal_ip, module.cmek, module.sql, google_compute_health_check.autohealing]
 }
 
 resource "google_compute_managed_ssl_certificate" "lb_default" {
@@ -204,7 +189,6 @@ module "load-balancer" {
   instance_group        = module.vm-template.instance_group
   health_check_id       = google_compute_health_check.autohealing.id
   ssl_certificate_name  = google_compute_managed_ssl_certificate.lb_default.name
-  depends_on            = [module.vm-template, google_compute_managed_ssl_certificate.lb_default]
 }
 
 resource "google_dns_record_set" "default" {
@@ -213,6 +197,4 @@ resource "google_dns_record_set" "default" {
   type         = "A"
   rrdatas      = [module.load-balancer.ip_address]
   ttl          = var.dns_record_ttl
-
-  depends_on = [module.load-balancer]
 }

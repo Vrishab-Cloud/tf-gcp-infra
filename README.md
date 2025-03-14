@@ -41,6 +41,12 @@
 
         gcloud services enable cloudkms.googleapis.com --project=$PROJECT_ID
 
+        gcloud services enable dns.googleapis.com --project=$PROJECT_ID
+
+        gcloud services enable networkconnectivity.googleapis.com --project=$PROJECT_ID
+
+        gcloud services enable cloudasset.googleapis.com --project=$PROJECT_ID
+
 7) Initialize terraform
         
         terraform init

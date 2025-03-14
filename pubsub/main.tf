@@ -4,7 +4,8 @@ resource "google_pubsub_topic" "pubsub_topic" {
 }
 
 resource "google_service_account" "serverless" {
-  account_id = var.service_account_id
+  account_id   = var.service_account_id
+  display_name = "Pub Sub subscriber"
 }
 
 resource "google_project_iam_binding" "serverless-roles" {
@@ -15,8 +16,6 @@ resource "google_project_iam_binding" "serverless-roles" {
   members = [
     "serviceAccount:${google_service_account.serverless.email}",
   ]
-
-  depends_on = [google_service_account.serverless]
 }
 
 data "google_storage_bucket" "my-bucket" {
@@ -30,9 +29,6 @@ resource "google_cloudfunctions2_function" "serverless" {
   build_config {
     runtime     = var.runtime
     entry_point = var.entry_point
-    environment_variables = {
-
-    }
     source {
       storage_source {
         bucket = data.google_storage_bucket.my-bucket.name
@@ -73,5 +69,5 @@ resource "google_cloudfunctions2_function" "serverless" {
     retry_policy          = "RETRY_POLICY_RETRY"
   }
 
-  depends_on = [google_service_account.serverless, google_pubsub_topic.pubsub_topic]
+  depends_on = [google_project_iam_binding.serverless-roles]
 }
