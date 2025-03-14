@@ -106,7 +106,3 @@ variable "autoscaler_cooldown_period" {
 variable "autoscaler_cpu_utilization" {
   type = number
 }
-
-variable "encryption_id" {
-  type = string
-}

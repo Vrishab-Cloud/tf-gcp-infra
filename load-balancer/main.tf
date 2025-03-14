@@ -3,8 +3,6 @@ resource "google_compute_global_address" "lb" {
   ip_version = "IPV4"
 }
 
-
-
 resource "google_compute_backend_service" "webapp" {
   name                            = "webapp-backend-service"
   connection_draining_timeout_sec = 180

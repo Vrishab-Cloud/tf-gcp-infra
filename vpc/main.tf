@@ -31,31 +31,30 @@ resource "google_compute_route" "default" {
 }
 
 # Firewall Rules
-resource "google_compute_firewall" "allow_http" {
-  name    = "webapp-firewall-http"
-  network = google_compute_network.vpc_network.id
+resource "google_compute_firewall" "allow_health" {
+  name      = "webapp-firewall-lb"
+  network   = google_compute_network.vpc_network.id
+  direction = "INGRESS"
   allow {
     protocol = "tcp"
     ports    = ["3000"]
   }
 
-  direction          = "INGRESS"
-  target_tags        = concat(var.webapp_tags, ["http", "ingress"])
-  source_ranges      = var.gfe_proxies
-  destination_ranges = [var.webapp_ip_cidr]
+  target_tags   = concat(var.webapp_tags, ["http", "ingress"])
+  source_ranges = var.gfe_proxies
 }
 
-resource "google_compute_firewall" "allow_db" {
-  name    = "webapp-firewall-db"
+resource "google_compute_firewall" "allow_ssh" {
+  name    = "webapp-ssh"
   network = google_compute_network.vpc_network.id
   allow {
     protocol = "tcp"
-    ports    = ["3306"]
+    ports    = ["22"]
   }
 
-  direction          = "EGRESS"
-  target_tags        = concat(var.webapp_tags, ["db", "egress"])
-  destination_ranges = [var.db_ip_cidr]
+  direction     = "INGRESS"
+  target_tags   = concat(var.webapp_tags, ["http", "ingress"])
+  source_ranges = ["0.0.0.0/0"]
 }
 
 resource "google_compute_firewall" "deny_others_ingress" {
@@ -69,16 +68,4 @@ resource "google_compute_firewall" "deny_others_ingress" {
   priority      = 65534
   direction     = "INGRESS"
   source_ranges = ["0.0.0.0/0"]
-}
-
-
-resource "google_vpc_access_connector" "db_connector" {
-  name          = var.connector_name
-  ip_cidr_range = var.connector_ip_range
-  network       = google_compute_network.vpc_network.name
-  machine_type  = "f1-micro"
-  min_instances = 2
-  max_instances = 3
-
-  depends_on = [google_compute_network.vpc_network]
 }

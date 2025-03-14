@@ -41,7 +41,3 @@ variable "sql_user" {
 variable "tier" {
   type = string
 }
-
-variable "encryption_id" {
-  type = string
-}

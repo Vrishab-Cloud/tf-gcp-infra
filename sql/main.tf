@@ -3,17 +3,15 @@ resource "random_id" "db_name_suffix" {
 }
 
 resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
+  length  = 16
+  special = false
 }
 
 resource "google_sql_database_instance" "mysql_instance" {
 
-  name                = "${var.instance_name_prefix}-${random_id.db_name_suffix.dec}"
-  region              = var.instance_region
-  database_version    = var.db_version
-  encryption_key_name = var.encryption_id
+  name             = "${var.instance_name_prefix}-${random_id.db_name_suffix.dec}"
+  region           = var.instance_region
+  database_version = var.db_version
   settings {
     tier = var.tier
 
@@ -30,7 +28,6 @@ resource "google_sql_database_instance" "mysql_instance" {
       psc_config {
         psc_enabled               = true
         allowed_consumer_projects = var.consumer_projects
-
       }
 
       ipv4_enabled = false
@@ -53,5 +50,5 @@ resource "google_sql_user" "users" {
   instance = google_sql_database_instance.mysql_instance.name
   password = random_password.password.result
 
-  depends_on = [google_sql_database_instance.mysql_instance]
+  depends_on = [google_sql_database_instance.mysql_instance, google_sql_database.database]
 }

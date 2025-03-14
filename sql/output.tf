@@ -3,8 +3,9 @@ output "db_instance_name" {
 }
 
 output "db_name" {
-  value = google_sql_database.database.name
+  value = var.db_name
 }
+
 output "db_instance_user" {
   value = google_sql_user.users.name
 }

@@ -1,9 +1,9 @@
-output "webapp_subnet_name" {
-  value = google_compute_subnetwork.subnet_webapp.name
+output "webapp_subnet" {
+  value = google_compute_subnetwork.subnet_webapp.id
 }
 
-output "db_subnet_name" {
-  value = google_compute_subnetwork.subnet_db.name
+output "db_subnet" {
+  value = google_compute_subnetwork.subnet_db.id
 }
 
 output "vpc_id" {
@@ -12,8 +12,4 @@ output "vpc_id" {
 
 output "webapp_firewall_tags" {
   value = var.webapp_tags
-}
-
-output "db_vpc_connector" {
-  value = google_vpc_access_connector.db_connector.name
 }
