@@ -18,6 +18,24 @@ resource "google_project_iam_binding" "serverless-roles" {
   ]
 }
 
+resource "google_secret_manager_secret" "mailgun_api_key" {
+  secret_id = "mailgun-api-key"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "mailgun_api_key_version" {
+  secret = google_secret_manager_secret.mailgun_api_key.id
+  secret_data = var.mail_api_key
+}
+
+resource "google_secret_manager_secret_iam_member" "serverless_secret_access" {
+  secret_id = google_secret_manager_secret.mailgun_api_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.serverless.email}"
+}
+
 data "google_storage_bucket" "my-bucket" {
   name = var.bucket_name
 }
@@ -35,7 +53,6 @@ resource "google_cloudfunctions2_function" "serverless" {
         object = var.bucket_object_name
       }
     }
-
   }
 
   service_config {
@@ -49,17 +66,21 @@ resource "google_cloudfunctions2_function" "serverless" {
       PROD_DB_USER = var.env_config.db_user
       PROD_DB_PASS = var.env_config.db_pass
       PROD_HOST    = var.env_config.db_host
-
-      DOMAIN_NAME     = var.env_config.domain_name
-      MAILGUN_API_KEY = var.env_config.api_key
+      DOMAIN_NAME  = var.env_config.domain_name
     }
-    service_account_email = google_service_account.serverless.email
+    
+    secret_environment_variables {
+      key        = "MAILGUN_API_KEY"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.mailgun_api_key.secret_id
+      version    = "latest"
+    }
 
+    service_account_email = google_service_account.serverless.email
     vpc_connector                 = var.vpc_connector
     vpc_connector_egress_settings = "PRIVATE_RANGES_ONLY"
     ingress_settings              = "ALLOW_INTERNAL_ONLY"
   }
-
 
   event_trigger {
     trigger_region        = var.region
@@ -69,5 +90,8 @@ resource "google_cloudfunctions2_function" "serverless" {
     retry_policy          = "RETRY_POLICY_RETRY"
   }
 
-  depends_on = [google_project_iam_binding.serverless-roles]
+  depends_on = [
+    google_project_iam_binding.serverless-roles,
+    google_secret_manager_secret_version.mailgun_api_key_version
+  ]
 }

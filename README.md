@@ -1,65 +1,101 @@
-# Steps
+# Terraform GCP Infrastructure
 
-1) Install Terraform
-   
-2) GCP CLI:
-   
-        gcloud init
+This repository contains Terraform code for provisioning and managing the infrastructure components of a Cloud Application on Google Cloud Platform (GCP). The infrastructure is modularized for maintainability and reusability.
 
-    (Note: Do not select any projects)
+## Table of Contents
+- [Project Overview](#terraform-gcp-infrastructure)
+- [Setup Instructions](#setup-instructions)
+- [Module Documentation](#module-documentation)
+- [Cleanup](#cleanup)
 
-3) Authenticate: 
-  
-        gcloud auth login
+## Setup Instructions
 
-4) Create and set Terraform up to use our current login:
+### Prerequisites
+1. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
+2. Install [Google Cloud CLI](https://cloud.google.com/sdk/docs/install)
 
-        PROJECT_ID=dev-${RANDOM}
-        gcloud projects create $PROJECT_ID --set-as-default
+### Initial Setup
+```bash
+gcloud init
+# Note: Do not select any projects
 
-        gcloud auth application-default login
+gcloud auth login
 
-5) Associate the billing for the new project 
-   
-6) Enable required APIs 
-   
-        gcloud services enable compute.googleapis.com --project=$PROJECT_ID
+# Create and set Terraform up to use our current login
+PROJECT_ID=dev-${RANDOM}
+gcloud projects create $PROJECT_ID --set-as-default
+gcloud auth application-default login
+```
 
-        gcloud services enable servicenetworking.googleapis.com --project=$PROJECT_ID
+### Enable Required APIs
+```bash
+gcloud services enable compute.googleapis.com --project=$PROJECT_ID
+gcloud services enable servicenetworking.googleapis.com --project=$PROJECT_ID
+gcloud services enable cloudbuild.googleapis.com --project=$PROJECT_ID
+gcloud services enable cloudfunctions.googleapis.com --project=$PROJECT_ID
+gcloud services enable pubsub.googleapis.com --project=$PROJECT_ID
+gcloud services enable eventarc.googleapis.com --project=$PROJECT_ID
+gcloud services enable run.googleapis.com --project=$PROJECT_ID
+gcloud services enable vpcaccess.googleapis.com --project=$PROJECT_ID
+gcloud services enable cloudkms.googleapis.com --project=$PROJECT_ID
+gcloud services enable dns.googleapis.com --project=$PROJECT_ID
+gcloud services enable networkconnectivity.googleapis.com --project=$PROJECT_ID
+gcloud services enable cloudasset.googleapis.com --project=$PROJECT_ID
+gcloud services enable secretmanager.googleapis.com --project=$PROJECT_ID
+```
 
-        gcloud services enable cloudbuild.googleapis.com --project=$PROJECT_ID
+### Initialize and Apply Terraform
+```bash
+terraform init
+terraform plan
+terraform apply
+```
 
-        gcloud services enable cloudfunctions.googleapis.com --project=$PROJECT_ID
+## Module Documentation
 
-        gcloud services enable pubsub.googleapis.com --project=$PROJECT_ID
+This project is organized into the following Terraform modules:
 
-        gcloud services enable eventarc.googleapis.com --project=$PROJECT_ID
+### 1. VPC
+- Creates Virtual Private Cloud network
+- Configures subnets, firewall rules, and network settings
+- Located in `vpc/` directory
 
-        gcloud services enable run.googleapis.com --project=$PROJECT_ID
+### 2. VM Template
+- Defines base VM configurations
+- Creates instance templates for compute instances
+- Located in `vm-template/` directory
 
-        gcloud services enable vpcaccess.googleapis.com --project=$PROJECT_ID
+### 3. Load Balancer
+- Sets up GCP load balancing
+- Configures forwarding rules and backend services
+- Located in `load-balancer/` directory
 
-        gcloud services enable cloudkms.googleapis.com --project=$PROJECT_ID
+### 4. Pub/Sub
+- Configures Google Cloud Pub/Sub topics and subscriptions
+- Sets up message handling infrastructure
+- Located in `pubsub/` directory
 
-        gcloud services enable dns.googleapis.com --project=$PROJECT_ID
+### 5. SQL
+- Provisions Cloud SQL instances
+- Configures databases and users
+- Located in `sql/` directory
 
-        gcloud services enable networkconnectivity.googleapis.com --project=$PROJECT_ID
+## Troubleshooting
 
-        gcloud services enable cloudasset.googleapis.com --project=$PROJECT_ID
+### Common Issues During `terraform apply`
 
-7) Initialize terraform
-        
-        terraform init
+1. **API Not Enabled**:
+   - Error: "Google API not enabled"
+   - Solution: Ensure all required APIs are enabled (see Setup Instructions)
 
-(Note: It downloads the provider)
+2. **Permission Errors**:
+   - Error: "Permission denied" or "403 Forbidden"
+   - Solution: Verify your GCP account has proper IAM roles:
+     ```bash
+     gcloud projects add-iam-policy-binding $PROJECT_ID \
+       --member=user:YOUR_EMAIL \
+       --role=roles/editor
+     ```
 
-8) Plan & Apply
-        
-        terraform plan
-        terraform apply
-
-9) At end of the provisioning
-        
-        gcloud auth revoke
-
-        gcloud auth application-default revoke
+3. **Resource Creation Timeouts**:
+   - Error: "Timeout waiting for operation to complete"
