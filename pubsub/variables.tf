@@ -7,7 +7,7 @@ variable "project_id" {
 }
 
 variable "mail_api_key" {
-  type = string
+  type      = string
   sensitive = true
 }
 
