@@ -26,7 +26,7 @@ resource "google_secret_manager_secret" "mailgun_api_key" {
 }
 
 resource "google_secret_manager_secret_version" "mailgun_api_key_version" {
-  secret = google_secret_manager_secret.mailgun_api_key.id
+  secret      = google_secret_manager_secret.mailgun_api_key.id
   secret_data = var.mail_api_key
 }
 
@@ -68,7 +68,7 @@ resource "google_cloudfunctions2_function" "serverless" {
       PROD_HOST    = var.env_config.db_host
       DOMAIN_NAME  = var.env_config.domain_name
     }
-    
+
     secret_environment_variables {
       key        = "MAILGUN_API_KEY"
       project_id = var.project_id
@@ -76,7 +76,7 @@ resource "google_cloudfunctions2_function" "serverless" {
       version    = "latest"
     }
 
-    service_account_email = google_service_account.serverless.email
+    service_account_email         = google_service_account.serverless.email
     vpc_connector                 = var.vpc_connector
     vpc_connector_egress_settings = "PRIVATE_RANGES_ONLY"
     ingress_settings              = "ALLOW_INTERNAL_ONLY"
