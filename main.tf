@@ -152,7 +152,7 @@ module "vm-template" {
 
       echo "PROD_DB_NAME=${module.sql.db_name}" >> /tmp/.env
       echo "PROD_DB_USER=${module.sql.db_instance_user}" >> /tmp/.env
-      echo "PROD_DB_PASS=\"${module.sql.db_instance_password}\"" >> /tmp/.env
+      echo "PROD_DB_PASS=${module.sql.db_instance_password}" >> /tmp/.env
       echo "PROD_HOST=${google_compute_address.internal_ip.address}" >> /tmp/.env
       echo "NODE_ENV=production" >> /tmp/.env
       echo "GCP_PROJECT=${var.gcp_project}" >> /tmp/.env
